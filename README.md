@@ -1,5 +1,5 @@
 # jsonSize
-An online tool for analyzing large json to find heavy nodes and repetitive fragments in order to optimize the size.
+The tool for analyzing large JSONs to find heavy nodes and repetitive fragments with the aim of optimizing size.
 
 ![](res/preview.png)
 
