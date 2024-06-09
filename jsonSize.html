@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Viewer</title>
+    <title>JSON Size</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,8 +11,9 @@
             padding: 20px;
             background-color: #f0f0f0;
         }
-        h1 {
-            color: #333;
+        .json-input {
+            max-width: 99%;
+            height: 700px;
         }
         .json-container {
             white-space: pre-wrap;
@@ -26,14 +27,17 @@
             margin: 0 auto;
         }
         .json-key-group {
+            cursor: pointer;
+            color: #ffe2e3;
+            font-weight: bold;
+            background: #262f40;
+        }
+        .json-key-group:hover {
+            color: #338cff;
+        }
+        .json-border {
             color: #ff989f;
-            /*font-weight: bold;*/
-            /*border: #96ceff;*/
-            /*border-width: medium;*/
-            /*background: #f61515;*/
-            /*outline-width: medium;*/
-            /*outline-color: #00badb;*/
-            /*outline-style: groove;*/
+            font-weight: bold;
         }
         .json-key-value {
             color: #7da762;
@@ -63,47 +67,17 @@
         .json-info-group-tiny {
             color: #4f7640;
         }
-        .json-info-item {
-            color: #4e4e4e;
-            font-style: italic;
-        }
-        .json-focus {
-            cursor: pointer;
-            color: #07db00;
-            margin-right: 5px;
-            font-weight: bold;
-            /*outline-width: medium;*/
-            /*outline-color: #00badb;*/
-            outline-style: groove;
-        }
-        .json-toggle-all {
-            cursor: pointer;
-            color: #00badb;
-            margin-right: 5px;
-            font-weight: bold;
-            /*outline-width: medium;*/
-            /*outline-color: #00badb;*/
-            outline-style: groove;
-        }
-        .json-toggle {
-            cursor: pointer;
-            color: #a200db;
-            margin-right: 5px;
-            font-weight: bold;
-            /*outline-width: medium;*/
-            /*outline-color: #00badb;*/
-            outline-style: groove;
-        }
-        .json-toggle::before {
-            content: '▶';
-        }
-        .json-toggle.expanded::before {
-            content: '▼';
-        }
-        .hidden {
+        .gone {
             display: none;
         }
+        .invisible {
+            color: transparent;
+        }
         .json-group {
+        }
+        .json-collapsable {
+        }
+        .json-anticollapsable {
         }
         textarea {
             width: 100%;
@@ -130,7 +104,7 @@
     </style>
 </head>
 <body>
-    <textarea id="json-input" placeholder="Paste your JSON here...">{
+    <textarea id="json-input" class="json-input" placeholder="Paste your JSON here...">{
     "name": "John",
     "age": 30,
     "married": true,
@@ -154,80 +128,87 @@
         }
     }
 }</textarea>
-    <button onclick="displayJSON()">Display JSON</button>
+    <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
     <div id="json-display" class="json-container"></div>
 
     <script>
-        function getInfoMarginSz(beforeInfo, infoMod = 50) {
-            const beforeInfoMod = Math.floor(beforeInfo / infoMod + 1) * infoMod;
-            return beforeInfoMod - beforeInfo;
-        }
+        const INDENT_SPACES = 5;
+        const BUTTONS_WIDTH = 0;
 
         function createTreeElement(key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
             const isGroup = typeof value === 'object' && value !== null;
             const isArray = Array.isArray(value);
 
-            const marginBegin = '     '.repeat(1 + level + (isGroup ? - 1 : 0));
-            const marginEnd = '     '.repeat(1 + level);
+            const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
+            const marginBegin = ' '.repeat(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
+            const marginEnd = ' '.repeat(indentSpaces);
 
-            const keyStr = (key ? (isParentArray ? `${key}: ` : `"${key}": `) : '') + (isGroup ? (isArray ? '[' : '{') : '');
+            const keyStr = key ? `${key}` : '';
+            const delimStr = key ? `: ` : '';
+            const borderStartStr = isGroup ? (isArray ? '[' : '{') : '';
             const keySize = (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0;
+            let mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
+            sizeOut.value = mySize;
 
-            let beforeInfo = marginBegin.length + keyStr.length;
+            let beforeInfo = marginBegin.length + keyStr.length + delimStr.length + borderStartStr.length;
 
             if (isGroup) {
-                const count = Object.keys(value).length;
-                let i = 0;
-                let valueChilds = [];
-                let valueSize = 0;
-                for (const k in value) {
-                    let childSize = {
-                        value: 0
-                    };
-                    valueChilds.push(createTreeElement(k, value[k], childSize, fullSize, level + 1, i === count - 1, isArray));
-                    valueSize += childSize.value;
-                    i++;
+                const childCount = Object.keys(value).length;
+                beforeInfo += `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
+                const keyElement = document.createElement('span');
+                const valueElement = document.createElement('div');
+                const closureInlineElement = document.createElement('span');
+                const closureElement = document.createElement('span');
+
+                function appendValueChilds() {
+                    const count = Object.keys(value).length;
+                    let i = 0;
+                    let valueChilds = [];
+                    for (const k in value) {
+                        let childSize = {
+                            value: 0
+                        };
+                        const isLastChild = i === count - 1;
+                        const child = createTreeElement(k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
+                        valueChilds.push(pair(childSize.value, child));
+                        i++;
+                    }
+                    valueChilds
+                        .sort((a, b) => b.first - a.first)
+                        .forEach((it) => {
+                            valueElement.appendChild(it.second);
+                        });
                 }
 
-                const toggle = document.createElement('span');
-                toggle.classList.add('json-toggle');
                 if (level === 0) {
-                    toggle.classList.add('expanded');
+                    appendValueChilds();
                 }
-                toggle.onclick = () => {
-                    const collapsed = valueElement.classList.contains('hidden');
-                    if (collapsed) {
-                        toggle.classList.add('expanded');
-                        valueElement.classList.remove('hidden');
+
+                keyElement.onclick = () => {
+                    const toExpand = valueElement.classList.contains('gone');
+                    if (toExpand) {
+                        if (!valueElement.hasChildNodes()) {
+                            appendValueChilds();
+                        }
+                        valueElement.classList.remove('gone');
+                        closureInlineElement.classList.add('invisible');
+                        closureElement.classList.remove('gone');
                     } else {
-                        toggle.classList.remove('expanded');
-                        valueElement.classList.add('hidden');
+                        valueElement.classList.add('gone');
+                        closureInlineElement.classList.remove('invisible');
+                        closureElement.classList.add('gone');
                     }
                 };
-                // beforeInfo += 2;
 
-                const toggleAll = document.createElement('span');
-                toggleAll.classList.add('json-toggle-all');
-                toggleAll.textContent = '+';
-                toggleAll.onclick = () => {
-                    const expand = valueElement.classList.contains('hidden');
-                    toggleAllNodes(toggleAll, expand);
+                keyElement.oncontextmenu = () => {
+                    focusThis(key, value, isLast, mySize, isParentArray);
+                    return false;
                 };
-                // beforeInfo += 3;
 
-                const focus = document.createElement('span');
-                focus.classList.add('json-focus');
-                focus.textContent = '!';
-                focus.onclick = () => {
-                    focusThis(key, value, isLast, sizeOut.value, isParentArray);
-                };
-                // beforeInfo += 3;
-
+                beforeInfo += BUTTONS_WIDTH;
                 const infoMarginSz = getInfoMarginSz(beforeInfo);
-                sizeOut.value += keySize + 1/*{*/ + valueSize + 1/*}*/ + (isLast ? 0 : 1)/*,*/;
-                const infoStr = ' '.repeat(infoMarginSz) + formatAlignmentRight(formatBytes(sizeOut.value), 16)
-                    + ' | ' + formatPercent(sizeOut.value, fullSize)
-                    // + ' | ' + formatBytes(fullSize)
+                const infoStr = ' '.repeat(infoMarginSz) + formatAlignmentRight(formatBytes(mySize))
+                    + ' | ' + formatPercent(mySize, fullSize)
                 ;
 
                 // ---
@@ -238,46 +219,39 @@
                 marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
 
-                container.appendChild(focus);
-                container.appendChild(toggleAll);
-                container.appendChild(toggle);
-
-                const keyElement = document.createElement('span');
                 keyElement.classList.add('json-key-group');
                 keyElement.textContent = keyStr;
                 container.appendChild(keyElement);
 
+                const borderElement = document.createElement('span');
+                borderElement.classList.add('json-border');
+                borderElement.textContent = delimStr + borderStartStr;
+                container.appendChild(borderElement);
+
+                closureInlineElement.classList.add('json-border');
+                closureInlineElement.classList.add('json-anticollapsable');
+                closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
+                container.appendChild(closureInlineElement);
+
                 const infoElement = document.createElement('span');
                 infoElement.textContent = infoStr;
-                if (sizeOut.value > fullSize / 2) {
-                    infoElement.classList.add('json-info-group-huge');
-                    // infoElement.textContent = infoStr + 'h';
-                } else if (sizeOut.value > fullSize / 5) {
-                    infoElement.classList.add('json-info-group-big');
-                    // infoElement.textContent = infoStr + 'b';
-                } else if (sizeOut.value > fullSize / 7) {
-                    infoElement.classList.add('json-info-group-middle');
-                    // infoElement.textContent = infoStr + 'm';
-                } else if (sizeOut.value > fullSize / 10) {
-                    infoElement.classList.add('json-info-group-small');
-                    // infoElement.textContent = infoStr + 's';
-                } else {
-                    infoElement.classList.add('json-info-group-tiny');
-                    // infoElement.textContent = infoStr + 't';
-                }
+                setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
 
-                const valueElement = document.createElement('div');
-                valueChilds.forEach((it) => {
-                    valueElement.appendChild(it);
-                });
+                valueElement.classList.add('json-collapsable');
                 if (level !== 0) {
-                    valueElement.classList.add('hidden');
+                    valueElement.classList.add('gone');
+                    closureInlineElement.classList.remove('invisible');
+                    closureElement.classList.add('gone');
+                } else {
+                    valueElement.classList.remove('gone');
+                    closureInlineElement.classList.add('invisible');
+                    closureElement.classList.remove('gone');
                 }
                 container.appendChild(valueElement);
 
-                const closureElement = document.createElement('span');
-                closureElement.classList.add('json-key-group');
+                closureElement.classList.add('json-border');
+                closureElement.classList.add('json-collapsable');
                 closureElement.textContent = marginEnd + (isArray ? ']' : '}') + (isLast ? '' : ',');
                 container.appendChild(closureElement);
 
@@ -292,12 +266,11 @@
                     valueElement.classList.add('json-number');
                     valueStr = value + (isLast ? '' : ',');
                 }
-                const valueSize = valueStr.length;
-                beforeInfo += valueSize;
+                beforeInfo += valueStr.length;
 
-                const infoMarginSz = getInfoMarginSz(beforeInfo) + 5;
-                sizeOut.value += keySize + valueSize;
-                const infoStr = ' '.repeat(infoMarginSz) + formatAlignmentRight(formatBytes(sizeOut.value), 16);
+                const infoMarginSz = getInfoMarginSz(beforeInfo);
+                const infoStr = ' '.repeat(infoMarginSz) + formatAlignmentRight(formatBytes(mySize))
+                        + ' | ' + formatPercent(mySize, fullSize);
 
                 // ---
                 const container = document.createElement('div');
@@ -309,7 +282,7 @@
 
                 const keyElement = document.createElement('span');
                 keyElement.classList.add('json-key-value');
-                keyElement.textContent = keyStr;
+                keyElement.textContent = keyStr + delimStr + borderStartStr;
                 container.appendChild(keyElement);
 
                 valueElement.textContent = valueStr;
@@ -317,16 +290,38 @@
 
                 const infoElement = document.createElement('span');
                 infoElement.textContent = infoStr;
-                infoElement.classList.add('json-info-item');
+                setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
 
                 return container;
             }
         }
 
+        function setInfoClass(infoElement, mySize, fullSize) {
+            if (mySize > fullSize / 2) {
+                infoElement.classList.add('json-info-group-huge');
+            } else if (mySize > fullSize / 5) {
+                infoElement.classList.add('json-info-group-big');
+            } else if (mySize > fullSize / 7) {
+                infoElement.classList.add('json-info-group-middle');
+            } else if (mySize > fullSize / 10) {
+                infoElement.classList.add('json-info-group-small');
+            } else {
+                infoElement.classList.add('json-info-group-tiny');
+            }
+        }
+
+        function getInfoMarginSz(beforeInfo, infoMod = 20) {
+            const beforeInfoMod = Math.floor(beforeInfo / infoMod + 1) * infoMod;
+            return beforeInfoMod - beforeInfo;
+        }
+
+        function pair(a, b){
+            return { first: a, second: b };
+        }
+
         function calculateJsonSize(jsonData) {
             const jsonString = JSON.stringify(jsonData);
-            // alert(jsonString)
             return jsonString.length;
         }
 
@@ -342,7 +337,7 @@
             }
         }
 
-        function formatAlignmentRight(str, fullWidth) {
+        function formatAlignmentRight(str, fullWidth = 16) {
             const padding = Math.max(fullWidth - str.length, 0);
             return ' '.repeat(padding) + str;
         }
@@ -351,64 +346,60 @@
             return (bytes * 100.0 / fullSize).toFixed(2) + '%';
         }
 
-        function toggleAllNodes(toggleAll, expand) {
-            const container = toggleAll.parentNode;
-            const toggles = container.querySelectorAll('.json-toggle');
-            const elements = container.querySelectorAll('.json-group > div');
-
-            toggles.forEach(toggle => {
-                if (expand) {
-                    toggle.classList.add('expanded');
-                } else {
-                    toggle.classList.remove('expanded');
-                }
-            });
-
-            elements.forEach(element => {
-                if (expand) {
-                    element.classList.remove('hidden');
-                } else {
-                    element.classList.add('hidden');
-                }
-            });
-        }
+        // function toggleAllNodes(button, toExpand) {
+        //     const container = button.parentNode;
+        //     const collapsable = container.querySelectorAll('.json-collapsable');
+        //     const collapsable_anti = container.querySelectorAll('.json-anticollapsable');
+        //
+        //     collapsable.forEach(element => {
+        //         if (toExpand) {
+        //             element.classList.remove('gone');
+        //         } else {
+        //             element.classList.add('gone');
+        //         }
+        //     });
+        //
+        //     collapsable_anti.forEach(element => {
+        //         if (toExpand) {
+        //             element.classList.add('invisible');
+        //         } else {
+        //             element.classList.remove('invisible');
+        //         }
+        //     });
+        // }
 
         function focusThis(key, node, isLast, fullSize, isParentArray) {
             const display = document.getElementById('json-display');
             display.innerHTML = '';
             let size = {
                 value: 0
-                // value: (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0
-                // value: (key && !isParentArray) ? 1/*:*/ : 0
             };
-            // const fullSize = calculateJsonSize(node) + (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0;
-            // display.children
-            // display.childNodes
-            // display.lastChild
-            // display.lastElementChild
-            // display.removeChild(display.lastChild)
-            const level = 0;
-            display.appendChild(createTreeElement(key, node, size, fullSize, level, isLast, isParentArray));
+            display.appendChild(createTreeElement(key, node, size, fullSize, 0, isLast, isParentArray));
         }
 
         function displayJSON() {
-            const input = document.getElementById('json-input').value;
+            const input = document.getElementById('json-input');
+            input.classList.add('gone');
+            const displayJSONButton = document.getElementById('displayJSON-button');
+            displayJSONButton.innerText = "Reset";
+
             let json;
             try {
-                json = JSON.parse(input);
+                json = JSON.parse(input.value);
             } catch (e) {
                 alert('Invalid JSON');
                 return;
             }
             const display = document.getElementById('json-display');
             display.innerHTML = '';
-            let size = {
+            let sizeOut = {
                 value: 0
             };
-            display.appendChild(createTreeElement('', json, size, calculateJsonSize(json)));
-            // display.normalize()
+            display.appendChild(createTreeElement('', json, sizeOut, calculateJsonSize(json)));
+            display.normalize()
+            display.classList.remove('gone');
         }
-        // displayJSON();
+        document.getElementById('json-display').classList.add('gone');
     </script>
 </body>
 </html>
