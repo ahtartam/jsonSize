@@ -167,6 +167,7 @@
             const marginEnd = dotLine(indentSpaces);
 
             const container = document.createElement('div');
+            const keyElement = document.createElement('span');
 
             const marginElement = document.createElement('span');
             marginElement.classList.add('json-margin');
@@ -187,7 +188,6 @@
             if (isGroup) {
                 const childCount = Object.keys(value).length;
                 beforeInfoLen += BUTTONS_WIDTH + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
-                const keyElement = document.createElement('span');
                 const valueElement = document.createElement('div');
                 const closureInlineElement = document.createElement('span');
                 const closureMarginElement = document.createElement('span');
@@ -296,7 +296,6 @@
                 marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
 
-                const keyElement = document.createElement('span');
                 keyElement.classList.add('json-key-value');
                 keyElement.textContent = keyStr + delimStr + borderStartStr;
                 container.appendChild(keyElement);
