@@ -240,10 +240,6 @@
                     return false;
                 };
 
-                const infoBytes = formatBytes(mySize);
-                const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfoLen);
-
                 // ---
                 marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
@@ -261,11 +257,7 @@
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
                 container.appendChild(closureInlineElement);
 
-                infoMarginElement.textContent = infoMarginStr;
                 container.appendChild(infoMarginElement);
-
-                infoElement.textContent = infoStr;
-                setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
 
                 if (level !== 0) {
@@ -300,10 +292,6 @@
                 }
                 beforeInfoLen += valueStr.length;
 
-                const infoBytes = formatBytes(mySize);
-                const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfoLen);
-
                 // ---
                 marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
@@ -316,13 +304,18 @@
                 valueElement.textContent = valueStr;
                 container.appendChild(valueElement);
 
-                infoMarginElement.textContent = infoMarginStr;
                 container.appendChild(infoMarginElement);
-
-                infoElement.textContent = infoStr;
-                setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
             }
+
+            const infoBytes = formatBytes(mySize);
+            const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
+            const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfoLen);
+
+            infoMarginElement.textContent = infoMarginStr;
+            infoElement.textContent = infoStr;
+            setInfoClass(infoElement, mySize, fullSize);
+
             return container;
         }
 
