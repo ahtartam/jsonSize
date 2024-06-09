@@ -180,11 +180,11 @@
             let mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
             sizeOut.value = mySize;
 
-            let beforeInfo = marginBegin.length + keyStr.length + delimStr.length + borderStartStr.length;
+            let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length + borderStartStr.length;
 
             if (isGroup) {
                 const childCount = Object.keys(value).length;
-                beforeInfo += `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
+                beforeInfoLen += BUTTONS_WIDTH + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
                 const keyElement = document.createElement('span');
                 const valueElement = document.createElement('div');
                 const closureInlineElement = document.createElement('span');
@@ -238,10 +238,9 @@
                     return false;
                 };
 
-                beforeInfo += BUTTONS_WIDTH;
                 const infoBytes = formatBytes(mySize);
                 const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfo);
+                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfoLen);
 
                 // ---
                 const container = document.createElement('div');
@@ -302,11 +301,11 @@
                     valueElement.classList.add('json-number');
                     valueStr = value + (isLast ? '' : ',');
                 }
-                beforeInfo += valueStr.length;
+                beforeInfoLen += valueStr.length;
 
                 const infoBytes = formatBytes(mySize);
                 const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfo);
+                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfoLen);
 
                 // ---
                 const container = document.createElement('div');
