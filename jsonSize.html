@@ -357,7 +357,7 @@
             if (longDotLine.length < fullLen) {
                 longDotLine = LINE_SYMBOL.repeat(fullLen / oneLen + oneLen);
             }
-            return longDotLine.substring(fromStart, fullLen - 1) + ' ';
+            return longDotLine.substring(fromStart, fullLen - 1) + (fullLen === 0 ? '' : ' ');
         }
 
         function marginAlignmentRight(str, fromStart) {
