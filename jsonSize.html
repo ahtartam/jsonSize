@@ -52,7 +52,7 @@
             color: #7fb1d5;
         }
         .json-margin {
-            color: #5f5f5f;
+            color: #999999;
         }
         .json-info-group {
             color: #777777;
@@ -155,7 +155,7 @@
     <div id="json-display" class="json-container"></div>
 
     <script>
-        const INDENT_SPACES = 5;
+        const INDENT_SPACES = 4;
         const BUTTONS_WIDTH = 0;
 
         function createTreeElement(key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
@@ -357,7 +357,7 @@
             if (longDotLine.length < fullLen) {
                 longDotLine = LINE_SYMBOL.repeat(fullLen / oneLen + oneLen);
             }
-            return longDotLine.substring(fromStart, fullLen);
+            return longDotLine.substring(fromStart, fullLen - 1) + ' ';
         }
 
         function marginAlignmentRight(str, fromStart) {
