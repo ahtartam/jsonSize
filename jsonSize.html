@@ -303,16 +303,14 @@
 
                 valueElement.textContent = valueStr;
                 container.appendChild(valueElement);
-
                 container.appendChild(infoMarginElement);
                 container.appendChild(infoElement);
             }
 
             const infoBytes = formatBytes(mySize);
             const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-            const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfoLen);
 
-            infoMarginElement.textContent = infoMarginStr;
+            infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
             infoElement.textContent = infoStr;
             setInfoClass(infoElement, mySize, fullSize);
 
