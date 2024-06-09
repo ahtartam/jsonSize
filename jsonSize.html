@@ -233,7 +233,7 @@
 
                 beforeInfo += BUTTONS_WIDTH;
                 const infoMarginSz = getInfoMarginSz(beforeInfo);
-                const infoStr = dotLine(infoMarginSz) + formatAlignmentRight(formatBytes(mySize))
+                const infoStr = formatAlignmentRight(formatBytes(mySize), infoMarginSz)
                     + ' | ' + formatPercent(mySize, fullSize)
                 ;
 
@@ -295,7 +295,7 @@
                 beforeInfo += valueStr.length;
 
                 const infoMarginSz = getInfoMarginSz(beforeInfo);
-                const infoStr = dotLine(infoMarginSz) + formatAlignmentRight(formatBytes(mySize))
+                const infoStr = formatAlignmentRight(formatBytes(mySize), infoMarginSz)
                         + ' | ' + formatPercent(mySize, fullSize);
 
                 // ---
@@ -321,14 +321,6 @@
 
                 return container;
             }
-        }
-
-        function dotLine(charCount) {
-            const LINE_SYMBOL = '·  ';
-            // '·' U+00B7 &#183; \00B7
-            // '—' U+2014 &#8212; \2014
-            const len = LINE_SYMBOL.length;
-            return LINE_SYMBOL.repeat(charCount / len + len).substring(0, charCount);
         }
 
         function setInfoClass(infoElement, mySize, fullSize) {
@@ -371,9 +363,18 @@
             }
         }
 
-        function formatAlignmentRight(str, fullWidth = 16) {
+        function dotLine(charCount) {
+            const LINE_SYMBOL = '·  ';
+            // '·' U+00B7 &#183; \00B7
+            // '—' U+2014 &#8212; \2014
+            const len = LINE_SYMBOL.length;
+            return LINE_SYMBOL.repeat(charCount / len + len).substring(0, charCount);
+        }
+
+        function formatAlignmentRight(str, extPadding) {
+            const fullWidth = 16;
             const padding = Math.max(fullWidth - str.length, 0);
-            return dotLine(padding) + str;
+            return dotLine(padding + extPadding) + str;
         }
 
         function formatPercent(bytes, fullSize) {
