@@ -239,9 +239,8 @@
                 };
 
                 beforeInfo += BUTTONS_WIDTH;
-                const infoFormatted = formatAlignmentRight(formatBytes(mySize), beforeInfo);
-                const infoMarginStr = infoFormatted.first;
-                const infoStr = infoFormatted.second + ' | ' + formatPercent(mySize, fullSize);
+                const infoStr = formatBytes(mySize) + ' | ' + formatPercent(mySize, fullSize);
+                const infoMarginStr = marginAlignmentRight(infoStr, beforeInfo);
 
                 // ---
                 const container = document.createElement('div');
@@ -304,9 +303,8 @@
                 }
                 beforeInfo += valueStr.length;
 
-                const infoFormatted = formatAlignmentRight(formatBytes(mySize), beforeInfo);
-                const infoMarginStr = infoFormatted.first;
-                const infoStr = infoFormatted.second + ' | ' + formatPercent(mySize, fullSize);
+                const infoStr = formatBytes(mySize) + ' | ' + formatPercent(mySize, fullSize);
+                const infoMarginStr = marginAlignmentRight(infoStr, beforeInfo);
 
                 // ---
                 const container = document.createElement('div');
@@ -384,11 +382,11 @@
             return longDotLine.substring(fromStart, fullLen);
         }
 
-        function formatAlignmentRight(str, fromStart) {
+        function marginAlignmentRight(str, fromStart) {
             const extPadding = getInfoMarginSz(fromStart);
             const fullWidth = 16;
             const padding = Math.max(fullWidth - str.length, 0);
-            return pair(dotLine(padding + extPadding, fromStart), str);
+            return dotLine(padding + extPadding, fromStart);
         }
 
         function formatPercent(bytes, fullSize) {
