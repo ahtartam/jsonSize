@@ -169,6 +169,10 @@
             const marginElement = document.createElement('span');
             marginElement.classList.add('json-margin');
 
+            const infoMarginElement = document.createElement('span');
+            infoMarginElement.classList.add('json-margin');
+            const infoElement = document.createElement('span');
+
             const keyStr = key ? `${key}` : '';
             const delimStr = key ? `: ` : '';
             const borderStartStr = isGroup ? (isArray ? '[' : '{') : '';
@@ -235,9 +239,9 @@
                 };
 
                 beforeInfo += BUTTONS_WIDTH;
-                const infoStr = formatAlignmentRight(formatBytes(mySize), beforeInfo)
-                    + ' | ' + formatPercent(mySize, fullSize)
-                ;
+                const infoFormatted = formatAlignmentRight(formatBytes(mySize), beforeInfo);
+                const infoMarginStr = infoFormatted.first;
+                const infoStr = infoFormatted.second + ' | ' + formatPercent(mySize, fullSize);
 
                 // ---
                 const container = document.createElement('div');
@@ -258,7 +262,9 @@
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
                 container.appendChild(closureInlineElement);
 
-                const infoElement = document.createElement('span');
+                infoMarginElement.textContent = infoMarginStr;
+                container.appendChild(infoMarginElement);
+
                 infoElement.textContent = infoStr;
                 setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
@@ -298,8 +304,9 @@
                 }
                 beforeInfo += valueStr.length;
 
-                const infoStr = formatAlignmentRight(formatBytes(mySize), beforeInfo)
-                        + ' | ' + formatPercent(mySize, fullSize);
+                const infoFormatted = formatAlignmentRight(formatBytes(mySize), beforeInfo);
+                const infoMarginStr = infoFormatted.first;
+                const infoStr = infoFormatted.second + ' | ' + formatPercent(mySize, fullSize);
 
                 // ---
                 const container = document.createElement('div');
@@ -315,7 +322,9 @@
                 valueElement.textContent = valueStr;
                 container.appendChild(valueElement);
 
-                const infoElement = document.createElement('span');
+                infoMarginElement.textContent = infoMarginStr;
+                container.appendChild(infoMarginElement);
+
                 infoElement.textContent = infoStr;
                 setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
@@ -379,7 +388,7 @@
             const extPadding = getInfoMarginSz(fromStart);
             const fullWidth = 16;
             const padding = Math.max(fullWidth - str.length, 0);
-            return dotLine(padding + extPadding, fromStart) + str;
+            return pair(dotLine(padding + extPadding, fromStart), str);
         }
 
         function formatPercent(bytes, fullSize) {
