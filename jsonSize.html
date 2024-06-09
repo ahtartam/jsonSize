@@ -166,8 +166,8 @@
             const isArray = Array.isArray(value);
 
             const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
-            const marginBegin = ' '.repeat(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
-            const marginEnd = ' '.repeat(indentSpaces);
+            const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
+            const marginEnd = dotLine(indentSpaces);
 
             const keyStr = key ? `${key}` : '';
             const delimStr = key ? `: ` : '';
@@ -364,7 +364,7 @@
         const LINE_SYMBOL = '·' + ' '.repeat(INDENT_SPACES - 1); // '·' U+00B7 &#183; \00B7  |  '—' U+2014 &#8212; \2014
         let longDotLine = '';
         const oneLen = LINE_SYMBOL.length;
-        function dotLine(charCount, fromStart) {
+        function dotLine(charCount, fromStart = 0) {
             const fullLen = fromStart + charCount;
             if (longDotLine.length < fullLen) {
                 longDotLine = LINE_SYMBOL.repeat(fullLen / oneLen + oneLen);
