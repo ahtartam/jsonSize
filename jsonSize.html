@@ -137,7 +137,7 @@
         <div>
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
         </div>
-        <div>
+        <div id="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
             <p><b>Right click</b> - focus on this node.</p>
         </div>
@@ -393,8 +393,10 @@
             display.normalize()
             display.classList.remove('gone');
             displayJSONButton.classList.add('gone');
+            document.getElementById('hints').classList.remove('gone');
         }
         document.getElementById('json-display').classList.add('gone');
+        document.getElementById('hints').classList.add('gone');
     </script>
 </body>
 </html>
