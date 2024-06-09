@@ -164,7 +164,6 @@
 
             const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
             const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
-            const marginEnd = dotLine(indentSpaces);
 
             const container = document.createElement('div');
             const keyElement = document.createElement('span');
@@ -261,7 +260,7 @@
 
                 // ---
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
-                closureMarginElement.textContent = marginEnd;
+                closureMarginElement.textContent = dotLine(indentSpaces);
                 closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
 
                 container.appendChild(marginElement);
