@@ -240,23 +240,15 @@
                 };
 
                 // ---
-                container.appendChild(marginElement);
-
                 keyElement.classList.add('json-key-group');
                 keyElement.textContent = keyStr;
-                container.appendChild(keyElement);
 
                 const borderElement = document.createElement('span');
                 borderElement.classList.add('json-border');
                 borderElement.textContent = delimStr + borderStartStr;
-                container.appendChild(borderElement);
 
                 closureInlineElement.classList.add('json-border');
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
-                container.appendChild(closureInlineElement);
-
-                container.appendChild(infoMarginElement);
-                container.appendChild(infoElement);
 
                 if (level !== 0) {
                     valueElement.classList.add('gone');
@@ -269,14 +261,21 @@
                     closureMarginElement.classList.remove('gone');
                     closureElement.classList.remove('gone');
                 }
-                container.appendChild(valueElement);
 
                 closureMarginElement.classList.add('json-margin');
                 closureMarginElement.textContent = marginEnd;
-                container.appendChild(closureMarginElement);
 
                 closureElement.classList.add('json-border');
                 closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
+
+                container.appendChild(marginElement);
+                container.appendChild(keyElement);
+                container.appendChild(borderElement);
+                container.appendChild(closureInlineElement);
+                container.appendChild(infoMarginElement);
+                container.appendChild(infoElement);
+                container.appendChild(valueElement);
+                container.appendChild(closureMarginElement);
                 container.appendChild(closureElement);
             } else {
                 const valueElement = document.createElement('span');
@@ -291,13 +290,12 @@
                 beforeInfoLen += valueStr.length;
 
                 // ---
-                container.appendChild(marginElement);
-
                 keyElement.classList.add('json-key-value');
                 keyElement.textContent = keyStr + delimStr + borderStartStr;
-                container.appendChild(keyElement);
-
                 valueElement.textContent = valueStr;
+
+                container.appendChild(marginElement);
+                container.appendChild(keyElement);
                 container.appendChild(valueElement);
                 container.appendChild(infoMarginElement);
                 container.appendChild(infoElement);
