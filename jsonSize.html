@@ -189,8 +189,11 @@
                 beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
                 const valueElement = document.createElement('div');
                 const closureInlineElement = document.createElement('span');
+                closureInlineElement.classList.add('json-border');
                 const closureMarginElement = document.createElement('span');
+                closureMarginElement.classList.add('json-margin');
                 const closureElement = document.createElement('span');
+                closureElement.classList.add('json-border');
 
                 function appendValueChilds() {
                     const count = Object.keys(value).length;
@@ -257,13 +260,8 @@
                 borderElement.classList.add('json-border');
                 borderElement.textContent = delimStr + borderStartStr;
 
-                closureInlineElement.classList.add('json-border');
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
-
-                closureMarginElement.classList.add('json-margin');
                 closureMarginElement.textContent = marginEnd;
-
-                closureElement.classList.add('json-border');
                 closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
 
                 container.appendChild(marginElement);
