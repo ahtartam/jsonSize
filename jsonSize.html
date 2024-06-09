@@ -177,7 +177,7 @@
             const delimStr = key ? `: ` : '';
             const borderStartStr = isGroup ? (isArray ? '[' : '{') : '';
             const keySize = (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0;
-            let mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
+            const mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
             sizeOut.value = mySize;
 
             let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length + borderStartStr.length;
@@ -281,7 +281,6 @@
                 }
                 container.appendChild(valueElement);
 
-                closureMarginElement
                 closureMarginElement.classList.add('json-margin');
                 closureMarginElement.textContent = marginEnd;
                 container.appendChild(closureMarginElement);
