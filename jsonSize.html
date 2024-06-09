@@ -176,17 +176,17 @@
 
             const keyStr = key ? `${key}` : '';
             const delimStr = key ? `: ` : '';
-            const borderStartStr = isGroup ? (isArray ? '[' : '{') : '';
             const keySize = (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0;
             const mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
             sizeOut.value = mySize;
 
-            let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length + borderStartStr.length;
+            let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
             marginElement.textContent = marginBegin
 
             if (isGroup) {
                 const childCount = Object.keys(value).length;
-                beforeInfoLen += BUTTONS_WIDTH + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
+                const borderStartStr = isArray ? '[' : '{';
+                beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
                 const valueElement = document.createElement('div');
                 const closureInlineElement = document.createElement('span');
                 const closureMarginElement = document.createElement('span');
@@ -291,7 +291,7 @@
 
                 // ---
                 keyElement.classList.add('json-key-value');
-                keyElement.textContent = keyStr + delimStr + borderStartStr;
+                keyElement.textContent = keyStr + delimStr;
                 valueElement.textContent = valueStr;
 
                 container.appendChild(marginElement);
