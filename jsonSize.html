@@ -79,6 +79,11 @@
         }
         .json-anticollapsable {
         }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
         textarea {
             width: 100%;
             height: 150px;
@@ -128,7 +133,15 @@
         }
     }
 }</textarea>
-    <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
+    <div class="container">
+        <div>
+            <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
+        </div>
+        <div>
+            <p><b>Left click</b> - expand/collapse the node.</p>
+            <p><b>Right click</b> - focus on this node.</p>
+        </div>
+    </div>
     <div id="json-display" class="json-container"></div>
 
     <script>
@@ -346,29 +359,11 @@
             return (bytes * 100.0 / fullSize).toFixed(2) + '%';
         }
 
-        // function toggleAllNodes(button, toExpand) {
-        //     const container = button.parentNode;
-        //     const collapsable = container.querySelectorAll('.json-collapsable');
-        //     const collapsable_anti = container.querySelectorAll('.json-anticollapsable');
-        //
-        //     collapsable.forEach(element => {
-        //         if (toExpand) {
-        //             element.classList.remove('gone');
-        //         } else {
-        //             element.classList.add('gone');
-        //         }
-        //     });
-        //
-        //     collapsable_anti.forEach(element => {
-        //         if (toExpand) {
-        //             element.classList.add('invisible');
-        //         } else {
-        //             element.classList.remove('invisible');
-        //         }
-        //     });
-        // }
-
         function focusThis(key, node, isLast, fullSize, isParentArray) {
+            const displayJSONButton = document.getElementById('displayJSON-button');
+            displayJSONButton.innerText = "Reset";
+            displayJSONButton.classList.remove('gone');
+
             const display = document.getElementById('json-display');
             display.innerHTML = '';
             let size = {
@@ -381,7 +376,6 @@
             const input = document.getElementById('json-input');
             input.classList.add('gone');
             const displayJSONButton = document.getElementById('displayJSON-button');
-            displayJSONButton.innerText = "Reset";
 
             let json;
             try {
@@ -398,6 +392,7 @@
             display.appendChild(createTreeElement('', json, sizeOut, calculateJsonSize(json)));
             display.normalize()
             display.classList.remove('gone');
+            displayJSONButton.classList.add('gone');
         }
         document.getElementById('json-display').classList.add('gone');
     </script>
