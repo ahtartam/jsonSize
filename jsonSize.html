@@ -198,11 +198,12 @@
                 function appendValueChilds() {
                     const count = Object.keys(value).length;
                     let i = 0;
-                    let valueChilds = [];
+                    const valueChilds = [];
+                    const childSize = {
+                        value: 0
+                    };
                     for (const k in value) {
-                        let childSize = {
-                            value: 0
-                        };
+                        childSize.value = 0;
                         const isLastChild = i === count - 1;
                         const child = createTreeElement(k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
                         valueChilds.push(pair(childSize.value, child));
@@ -229,11 +230,6 @@
                 }
                 // ---
 
-                const childCount = Object.keys(value).length;
-                const borderStartStr = isArray ? '[' : '{';
-                borderElement.textContent = delimStr + borderStartStr;
-                beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
-
                 if (level === 0) {
                     appendValueChilds();
                     doExpand();
@@ -258,11 +254,16 @@
                     return false;
                 };
 
-                // ---
+                const childCount = Object.keys(value).length;
+                const borderStartStr = isArray ? '[' : '{';
+                beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
+
+                borderElement.textContent = delimStr + borderStartStr;
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
                 closureMarginElement.textContent = dotLine(indentSpaces);
                 closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
 
+                // ---
                 container.appendChild(marginElement);
                 container.appendChild(keyElement);
                 container.appendChild(borderElement);
