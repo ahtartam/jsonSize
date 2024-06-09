@@ -212,10 +212,6 @@
                         });
                 }
 
-                if (level === 0) {
-                    appendValueChilds();
-                }
-
                 function doExpand() {
                     valueElement.classList.remove('gone');
                     closureInlineElement.classList.add('invisible');
@@ -227,6 +223,13 @@
                     closureInlineElement.classList.remove('invisible');
                     closureMarginElement.classList.add('gone');
                     closureElement.classList.add('gone');
+                }
+
+                if (level === 0) {
+                    appendValueChilds();
+                    doExpand();
+                } else {
+                    doCollapse();
                 }
 
                 keyElement.onclick = () => {
@@ -256,12 +259,6 @@
 
                 closureInlineElement.classList.add('json-border');
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
-
-                if (level === 0) {
-                    doExpand();
-                } else {
-                    doCollapse();
-                }
 
                 closureMarginElement.classList.add('json-margin');
                 closureMarginElement.textContent = marginEnd;
