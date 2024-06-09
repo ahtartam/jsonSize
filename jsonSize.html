@@ -25,6 +25,9 @@
             color: #f8f8f2;
             max-width: 98%;
             margin: 0 auto;
+            outline-width: medium;
+            outline-color: #e2e2e2;
+            outline-style: groove;
         }
         .json-key-group {
             cursor: pointer;
@@ -78,6 +81,16 @@
         .json-collapsable {
         }
         .json-anticollapsable {
+        }
+        .hints {
+            line-height: 6px;
+            padding-left: 16px;
+            padding-right: 16px;
+            margin-bottom: 8px;
+            background: #cccccc;
+            outline-width: medium;
+            outline-color: #e2e2e2;
+            outline-style: groove;
         }
         .container {
             display: flex;
@@ -137,7 +150,7 @@
         <div>
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
         </div>
-        <div id="hints">
+        <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
             <p><b>Right click</b> - focus on this node.</p>
         </div>
