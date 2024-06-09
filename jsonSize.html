@@ -168,10 +168,8 @@
 
             const container = document.createElement('div');
             const keyElement = document.createElement('span');
-
             const marginElement = document.createElement('span');
             marginElement.classList.add('json-margin');
-
             const infoMarginElement = document.createElement('span');
             infoMarginElement.classList.add('json-margin');
             const infoElement = document.createElement('span');
@@ -184,6 +182,7 @@
             sizeOut.value = mySize;
 
             let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length + borderStartStr.length;
+            marginElement.textContent = marginBegin
 
             if (isGroup) {
                 const childCount = Object.keys(value).length;
@@ -241,7 +240,6 @@
                 };
 
                 // ---
-                marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
 
                 keyElement.classList.add('json-key-group');
@@ -293,7 +291,6 @@
                 beforeInfoLen += valueStr.length;
 
                 // ---
-                marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
 
                 keyElement.classList.add('json-key-value');
