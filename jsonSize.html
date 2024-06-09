@@ -184,9 +184,10 @@
             marginElement.textContent = marginBegin
 
             if (isGroup) {
-                const childCount = Object.keys(value).length;
-                const borderStartStr = isArray ? '[' : '{';
-                beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
+                keyElement.classList.add('json-key-group');
+                keyElement.textContent = keyStr;
+                const borderElement = document.createElement('span');
+                borderElement.classList.add('json-border');
                 const valueElement = document.createElement('div');
                 const closureInlineElement = document.createElement('span');
                 closureInlineElement.classList.add('json-border');
@@ -227,6 +228,12 @@
                     closureMarginElement.classList.add('gone');
                     closureElement.classList.add('gone');
                 }
+                // ---
+
+                const childCount = Object.keys(value).length;
+                const borderStartStr = isArray ? '[' : '{';
+                borderElement.textContent = delimStr + borderStartStr;
+                beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
 
                 if (level === 0) {
                     appendValueChilds();
@@ -253,13 +260,6 @@
                 };
 
                 // ---
-                keyElement.classList.add('json-key-group');
-                keyElement.textContent = keyStr;
-
-                const borderElement = document.createElement('span');
-                borderElement.classList.add('json-border');
-                borderElement.textContent = delimStr + borderStartStr;
-
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
                 closureMarginElement.textContent = marginEnd;
                 closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
