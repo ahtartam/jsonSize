@@ -302,10 +302,8 @@
             }
 
             const infoBytes = formatBytes(mySize);
-            const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-
             infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
-            infoElement.textContent = infoStr;
+            infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize);
             setInfoClass(infoElement, mySize, fullSize);
 
             return container;
