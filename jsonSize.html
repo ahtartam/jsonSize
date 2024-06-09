@@ -190,6 +190,7 @@
                 const keyElement = document.createElement('span');
                 const valueElement = document.createElement('div');
                 const closureInlineElement = document.createElement('span');
+                const closureMarginElement = document.createElement('span');
                 const closureElement = document.createElement('span');
 
                 function appendValueChilds() {
@@ -224,10 +225,12 @@
                         }
                         valueElement.classList.remove('gone');
                         closureInlineElement.classList.add('invisible');
+                        closureMarginElement.classList.remove('gone');
                         closureElement.classList.remove('gone');
                     } else {
                         valueElement.classList.add('gone');
                         closureInlineElement.classList.remove('invisible');
+                        closureMarginElement.classList.add('gone');
                         closureElement.classList.add('gone');
                     }
                 };
@@ -272,17 +275,25 @@
                 if (level !== 0) {
                     valueElement.classList.add('gone');
                     closureInlineElement.classList.remove('invisible');
+                    closureMarginElement.classList.add('gone');
                     closureElement.classList.add('gone');
                 } else {
                     valueElement.classList.remove('gone');
                     closureInlineElement.classList.add('invisible');
+                    closureMarginElement.classList.remove('gone');
                     closureElement.classList.remove('gone');
                 }
                 container.appendChild(valueElement);
 
+                closureMarginElement
+                closureMarginElement.classList.add('json-margin');
+                closureMarginElement.classList.add('json-collapsable');
+                closureMarginElement.textContent = marginEnd;
+                container.appendChild(closureMarginElement);
+
                 closureElement.classList.add('json-border');
                 closureElement.classList.add('json-collapsable');
-                closureElement.textContent = marginEnd + (isArray ? ']' : '}') + (isLast ? '' : ',');
+                closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
                 container.appendChild(closureElement);
 
                 return container;
