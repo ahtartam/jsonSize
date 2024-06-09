@@ -239,8 +239,9 @@
                 };
 
                 beforeInfo += BUTTONS_WIDTH;
-                const infoStr = formatBytes(mySize) + ' | ' + formatPercent(mySize, fullSize);
-                const infoMarginStr = marginAlignmentRight(infoStr, beforeInfo);
+                const infoBytes = formatBytes(mySize);
+                const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
+                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfo);
 
                 // ---
                 const container = document.createElement('div');
@@ -303,8 +304,9 @@
                 }
                 beforeInfo += valueStr.length;
 
-                const infoStr = formatBytes(mySize) + ' | ' + formatPercent(mySize, fullSize);
-                const infoMarginStr = marginAlignmentRight(infoStr, beforeInfo);
+                const infoBytes = formatBytes(mySize);
+                const infoStr = infoBytes + ' | ' + formatPercent(mySize, fullSize);
+                const infoMarginStr = marginAlignmentRight(infoBytes, beforeInfo);
 
                 // ---
                 const container = document.createElement('div');
@@ -371,6 +373,10 @@
             }
         }
 
+        function formatPercent(bytes, fullSize) {
+            return (bytes * 100.0 / fullSize).toFixed(2) + '%';
+        }
+
         const LINE_SYMBOL = '·' + ' '.repeat(INDENT_SPACES - 1); // '·' U+00B7 &#183; \00B7  |  '—' U+2014 &#8212; \2014
         let longDotLine = '';
         const oneLen = LINE_SYMBOL.length;
@@ -387,10 +393,6 @@
             const fullWidth = 16;
             const padding = Math.max(fullWidth - str.length, 0);
             return dotLine(padding + extPadding, fromStart);
-        }
-
-        function formatPercent(bytes, fullSize) {
-            return (bytes * 100.0 / fullSize).toFixed(2) + '%';
         }
 
         function focusThis(key, node, isLast, fullSize, isParentArray) {
