@@ -79,12 +79,6 @@
         .invisible {
             color: transparent;
         }
-        .json-group {
-        }
-        .json-collapsable {
-        }
-        .json-anticollapsable {
-        }
         .hints {
             line-height: 6px;
             padding-left: 16px;
@@ -247,7 +241,6 @@
 
                 // ---
                 const container = document.createElement('div');
-                container.classList.add('json-group');
 
                 marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
@@ -262,7 +255,6 @@
                 container.appendChild(borderElement);
 
                 closureInlineElement.classList.add('json-border');
-                closureInlineElement.classList.add('json-anticollapsable');
                 closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
                 container.appendChild(closureInlineElement);
 
@@ -271,7 +263,6 @@
                 setInfoClass(infoElement, mySize, fullSize);
                 container.appendChild(infoElement);
 
-                valueElement.classList.add('json-collapsable');
                 if (level !== 0) {
                     valueElement.classList.add('gone');
                     closureInlineElement.classList.remove('invisible');
@@ -287,12 +278,10 @@
 
                 closureMarginElement
                 closureMarginElement.classList.add('json-margin');
-                closureMarginElement.classList.add('json-collapsable');
                 closureMarginElement.textContent = marginEnd;
                 container.appendChild(closureMarginElement);
 
                 closureElement.classList.add('json-border');
-                closureElement.classList.add('json-collapsable');
                 closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
                 container.appendChild(closureElement);
 
@@ -314,7 +303,6 @@
 
                 // ---
                 const container = document.createElement('div');
-                container.classList.add('json-group');
 
                 marginElement.textContent = marginBegin
                 container.appendChild(marginElement);
