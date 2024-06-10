@@ -123,6 +123,9 @@
         button:hover {
             background-color: #4a90e2;
         }
+        .find-button {
+            margin-left: 15px;
+        }
     </style>
 </head>
 <body>
@@ -154,6 +157,10 @@
         <div>
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
             <button id="formatJSON-button" onclick="formatJSON()">Format</button>
+        </div>
+        <div id="search-box">
+            <input id="find-input" size="40" value="">
+            <button id="find-button" class="find-button" onclick="search()">Search</button>
         </div>
         <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
@@ -368,8 +375,8 @@
         }
 
         function calculateJsonSize(jsonData) {
-            const jsonString = JSON.stringify(jsonData);
-            return jsonString.length;
+            const jsonStr = JSON.stringify(jsonData);
+            return jsonStr.length;
         }
 
         function formatBytes(bytes) {
@@ -430,13 +437,41 @@
             input.value = JSON.stringify(json, null, ' ');
         }
 
+        function findInJson(json, str, path = '') {
+            let result = '';
+
+            for (const key in json) {
+                const newPath = `${path}/${key}`;
+                const value = json[key];
+                if (key.toUpperCase().includes(str)) {
+                    result += `${newPath}/KEY;`;
+                }
+                const isGroup = typeof value === 'object' && value !== null;
+                if (isGroup) {
+                    result += findInJson(value, str, newPath);
+                } else {
+                    if (`${value}`.toUpperCase().includes(str)) {
+                        result += `${newPath}/VALUE;`;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        function search() {
+            const input = document.getElementById('find-input');
+
+            console.log(findInJson(json, input.value.toUpperCase()));
+        }
+
+        let json;
         let jsonString = '';
         function displayJSON() {
             const input = document.getElementById('json-input');
             input.classList.add('gone');
             const displayJSONButton = document.getElementById('displayJSON-button');
 
-            let json;
             try {
                 json = JSON.parse(input.value);
             } catch (e) {
@@ -455,10 +490,12 @@
             display.normalize()
             display.classList.remove('gone');
             displayJSONButton.innerText = "Reset";
+            document.getElementById('search-box').classList.remove('gone');
             document.getElementById('hints').classList.remove('gone');
             document.getElementById('formatJSON-button').classList.add('gone');
         }
         document.getElementById('json-display').classList.add('gone');
+        document.getElementById('search-box').classList.add('gone');
         document.getElementById('hints').classList.add('gone');
     </script>
 </body>
