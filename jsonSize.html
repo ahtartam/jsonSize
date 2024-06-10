@@ -185,7 +185,6 @@
             const container = document.createElement('div');
             const keyElement = document.createElement('span');
             keyElement.id = `KEY(${path})`;
-            console.log(`keyElement.id = ${keyElement.id}`);
             const marginElement = document.createElement('span');
             marginElement.classList.add('json-margin');
             const infoMarginElement = document.createElement('span');
@@ -210,7 +209,6 @@
                 borderElement.classList.add('json-border');
                 const valueElement = document.createElement('div');
                 valueElement.id = `GROUP(${path})`;
-                console.log(`valueElement.id = ${valueElement.id}`);
                 const closureInlineElement = document.createElement('span');
                 closureInlineElement.classList.add('json-border');
                 const closureMarginElement = document.createElement('span');
@@ -295,7 +293,6 @@
             } else {
                 const valueElement = document.createElement('span');
                 valueElement.id = `VALUE(${path})`;
-                console.log(`valueElement.id = ${valueElement.id}`);
                 let valueStr;
                 if (typeof value === 'string') {
                     if (value.length > STRING_LENGTH_LIMIT) {
@@ -474,17 +471,25 @@
                 const result = results[0];
                 console.log(`results[0]=${result}`);
 
-                const keyItem = document.getElementById(`KEY(${result})`);
-                const groupItem = document.getElementById(`GROUP(${result})`);
-                console.log(`keyItem=${keyItem}`);
-                if (keyItem != null) {
-                    if (groupItem != null) {
-                        const isCollapsed = groupItem.classList.contains('gone');
-                        if (isCollapsed) {
+                const pathItems = result.split('/');
+                let path = '';
+                for (const i in pathItems) {
+                    if (i === 0 || i === '0') continue;
+
+                    path += `/${pathItems[i]}`;
+                    console.log(`pathItems[${i}] = ${pathItems[i]}; path = ${path}`);
+                    const keyItem = document.getElementById(`KEY(${path})`);
+                    const groupItem = document.getElementById(`GROUP(${path})`);
+                    console.log(`keyItem=${keyItem}`);
+                    if (keyItem != null) {
+                        if (groupItem != null) {
+                            const isCollapsed = groupItem.classList.contains('gone');
+                            if (isCollapsed) {
+                                keyItem.onclick(null);
+                            }
+                        } else {
                             keyItem.onclick(null);
                         }
-                    } else {
-                        keyItem.onclick(null);
                     }
                 }
             }
