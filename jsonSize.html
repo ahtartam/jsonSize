@@ -175,7 +175,7 @@
         const STRING_LENGTH_LIMIT = 160;
         const STRING_LENGTH_CUT = 80;
 
-        function createTreeElement(key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
+        function createTreeElement(path, key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
             const isGroup = typeof value === 'object' && value !== null;
             const isArray = Array.isArray(value);
 
@@ -202,6 +202,7 @@
             let addInfo = '';
 
             if (isGroup) {
+                keyElement.id = path;
                 keyElement.classList.add('json-key-group');
                 keyElement.textContent = keyStr;
                 const borderElement = document.createElement('span');
@@ -224,7 +225,8 @@
                     for (const k in value) {
                         childSize.value = 0;
                         const isLastChild = i === count - 1;
-                        const child = createTreeElement(k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
+                        const newPath = `${path}/${k}`;
+                        const child = createTreeElement(newPath, k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
                         valueChilds.push(pair(childSize.value, child));
                         i++;
                     }
@@ -269,7 +271,7 @@
                 };
 
                 keyElement.oncontextmenu = () => {
-                    focusThis(key, value, isLast, mySize, isParentArray);
+                    focusThis(path, key, value, isLast, mySize, isParentArray);
                     return false;
                 };
 
@@ -414,13 +416,13 @@
             return dotLine(padding + extPadding, fromStart);
         }
 
-        function focusThis(key, node, isLast, fullSize, isParentArray) {
+        function focusThis(path, key, node, isLast, fullSize, isParentArray) {
             const display = document.getElementById('json-display');
             display.innerHTML = '';
             let size = {
                 value: 0
             };
-            display.appendChild(createTreeElement(key, node, size, fullSize, 0, isLast, isParentArray));
+            display.appendChild(createTreeElement(path, key, node, size, fullSize, 0, isLast, isParentArray));
         }
 
         function formatJSON() {
@@ -444,14 +446,14 @@
                 const newPath = `${path}/${key}`;
                 const value = json[key];
                 if (key.toUpperCase().includes(str)) {
-                    result += `${newPath}/KEY;`;
+                    result += `${newPath}/KEY;\n`;
                 }
                 const isGroup = typeof value === 'object' && value !== null;
                 if (isGroup) {
                     result += findInJson(value, str, newPath);
                 } else {
                     if (`${value}`.toUpperCase().includes(str)) {
-                        result += `${newPath}/VALUE;`;
+                        result += `${newPath}/VALUE;\n`;
                     }
                 }
             }
@@ -486,7 +488,7 @@
 
             jsonString = JSON.stringify(json);
             const jsonSize = jsonString.length;
-            display.appendChild(createTreeElement('', json, sizeOut, jsonSize));
+            display.appendChild(createTreeElement('', '', json, sizeOut, jsonSize));
             display.normalize()
             display.classList.remove('gone');
             displayJSONButton.innerText = "Reset";
