@@ -402,10 +402,6 @@
         }
 
         function focusThis(key, node, isLast, fullSize, isParentArray) {
-            const displayJSONButton = document.getElementById('displayJSON-button');
-            displayJSONButton.innerText = "Reset";
-            displayJSONButton.classList.remove('gone');
-
             const display = document.getElementById('json-display');
             display.innerHTML = '';
             let size = {
@@ -438,7 +434,7 @@
             display.appendChild(createTreeElement('', json, sizeOut, jsonSize));
             display.normalize()
             display.classList.remove('gone');
-            displayJSONButton.classList.add('gone');
+            displayJSONButton.innerText = "Reset";
             document.getElementById('hints').classList.remove('gone');
         }
         document.getElementById('json-display').classList.add('gone');
