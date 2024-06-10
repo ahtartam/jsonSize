@@ -203,6 +203,7 @@
 
             if (isGroup) {
                 keyElement.id = path;
+                console.log(`keyElement.id = ${keyElement.id}`);
                 keyElement.classList.add('json-key-group');
                 keyElement.textContent = keyStr;
                 const borderElement = document.createElement('span');
@@ -449,7 +450,8 @@
                     result += findInJson(value, str, newPath);
                 } else {
                     if (`${value}`.toUpperCase().includes(str)) {
-                        result += `${newPath};\n`;
+                        // result += `${newPath};\n`;
+                        result += `${path};\n`;
                     }
                 }
             }
@@ -468,7 +470,11 @@
                 const result = results[0];
                 console.log(`results[0]=${result}`);
 
-                const valueItem = document.getElementById(result);
+                const keyItem = document.getElementById(result);
+                console.log(`keyItem=${keyItem}`);
+                if (keyItem != null) {
+                    keyItem.onclick(null);
+                }
             }
         }
 
