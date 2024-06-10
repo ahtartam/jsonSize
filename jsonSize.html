@@ -237,37 +237,32 @@
                         });
                 }
 
-                function doExpand() {
-                    valueElement.classList.remove('gone');
-                    closureInlineElement.classList.add('invisible');
-                    closureMarginElement.classList.remove('gone');
-                    closureElement.classList.remove('gone');
-                }
-                function doCollapse() {
-                    valueElement.classList.add('gone');
-                    closureInlineElement.classList.remove('invisible');
-                    closureMarginElement.classList.add('gone');
-                    closureElement.classList.add('gone');
+                function onExpandCollapse(toExpand) {
+                    if (toExpand) {
+                        valueElement.classList.remove('gone');
+                        closureMarginElement.classList.remove('gone');
+                        closureElement.classList.remove('gone');
+                        closureInlineElement.classList.add('invisible');
+                    } else {
+                        valueElement.classList.add('gone');
+                        closureMarginElement.classList.add('gone');
+                        closureElement.classList.add('gone');
+                        closureInlineElement.classList.remove('invisible');
+                    }
                 }
                 // ---
 
                 if (level === 0) {
                     appendValueChilds();
-                    doExpand();
-                } else {
-                    doCollapse();
                 }
+                onExpandCollapse(level === 0);
 
                 keyElement.onclick = () => {
                     const toExpand = valueElement.classList.contains('gone');
-                    if (toExpand) {
-                        if (!valueElement.hasChildNodes()) {
-                            appendValueChilds();
-                        }
-                        doExpand();
-                    } else {
-                        doCollapse();
+                    if (toExpand && !valueElement.hasChildNodes()) {
+                        appendValueChilds();
                     }
+                    onExpandCollapse(toExpand);
                 };
 
                 keyElement.oncontextmenu = () => {
@@ -441,19 +436,20 @@
 
         function findInJson(json, str, path = '') {
             let result = '';
+            const isArray = Array.isArray(json);
 
             for (const key in json) {
                 const newPath = `${path}/${key}`;
                 const value = json[key];
-                if (key.toUpperCase().includes(str)) {
-                    result += `${newPath}/KEY;\n`;
+                if (!isArray && key.toUpperCase().includes(str)) {
+                    result += `${newPath};\n`;
                 }
                 const isGroup = typeof value === 'object' && value !== null;
                 if (isGroup) {
                     result += findInJson(value, str, newPath);
                 } else {
                     if (`${value}`.toUpperCase().includes(str)) {
-                        result += `${newPath}/VALUE;\n`;
+                        result += `${newPath};\n`;
                     }
                 }
             }
@@ -464,7 +460,16 @@
         function search() {
             const input = document.getElementById('find-input');
 
-            console.log(findInJson(json, input.value.toUpperCase()));
+            const results = findInJson(json, input.value.toUpperCase()).split(';\n').filter((v) => v.length > 0);
+
+            console.log(results);
+
+            if (results.length > 0) {
+                const result = results[0];
+                console.log(`results[0]=${result}`);
+
+                const valueItem = document.getElementById(result);
+            }
         }
 
         let json;
