@@ -190,6 +190,8 @@
             let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
             marginElement.textContent = marginBegin
 
+            let addInfo = '';
+
             if (isGroup) {
                 keyElement.classList.add('json-key-group');
                 keyElement.textContent = keyStr;
@@ -304,6 +306,12 @@
                         valueStr = `"${value}"`;
                     }
                     valueStr += (isLast ? '' : ',');
+
+                    const match = jsonString.match(new RegExp(String.raw`${value}`, "g"));
+                    const count = (match || []).length;
+                    if (count > 1) {
+                        addInfo += 'Duplication: ' + count + ' times.';
+                    }
                 } else {
                     valueElement.classList.add('json-number');
                     valueStr = value + (isLast ? '' : ',');
@@ -324,7 +332,7 @@
 
             const infoBytes = formatBytes(mySize);
             infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
-            infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize);
+            infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize) + (addInfo ==='' ? '' : ' | ' + addInfo);
             setInfoClass(infoElement, mySize, fullSize);
 
             return container;
@@ -406,6 +414,7 @@
             display.appendChild(createTreeElement(key, node, size, fullSize, 0, isLast, isParentArray));
         }
 
+        let jsonString = '';
         function displayJSON() {
             const input = document.getElementById('json-input');
             input.classList.add('gone');
@@ -423,7 +432,10 @@
             let sizeOut = {
                 value: 0
             };
-            display.appendChild(createTreeElement('', json, sizeOut, calculateJsonSize(json)));
+
+            jsonString = JSON.stringify(json);
+            const jsonSize = jsonString.length;
+            display.appendChild(createTreeElement('', json, sizeOut, jsonSize));
             display.normalize()
             display.classList.remove('gone');
             displayJSONButton.classList.add('gone');
