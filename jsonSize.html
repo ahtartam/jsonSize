@@ -460,16 +460,25 @@
             return result;
         }
 
+        let lastSearchRequest = '';
+        let lastSearchIndex = -1;
         function search() {
             const input = document.getElementById('find-input');
+            const request = input.value;
+            const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
 
-            const results = findInJson(json, input.value.toUpperCase()).split(';\n').filter((v) => v.length > 0);
+            if (lastSearchRequest !== request) {
+                lastSearchIndex = -1;
+            }
+            lastSearchRequest = request;
 
-            console.log(results);
+            lastSearchIndex++;
+            if (results.length <= lastSearchIndex) {
+                lastSearchIndex = 0;
+            }
 
-            if (results.length > 0) {
-                const result = results[0];
-                console.log(`results[0]=${result}`);
+            if (results.length > lastSearchIndex) {
+                const result = results[lastSearchIndex];
 
                 const pathItems = result.split('/');
                 let path = '';
@@ -477,10 +486,8 @@
                     if (i === 0 || i === '0') continue;
 
                     path += `/${pathItems[i]}`;
-                    console.log(`pathItems[${i}] = ${pathItems[i]}; path = ${path}`);
                     const keyItem = document.getElementById(`KEY(${path})`);
                     const groupItem = document.getElementById(`GROUP(${path})`);
-                    console.log(`keyItem=${keyItem}`);
                     if (keyItem != null) {
                         if (groupItem != null) {
                             const isCollapsed = groupItem.classList.contains('gone');
