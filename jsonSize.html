@@ -153,6 +153,7 @@
     <div class="container">
         <div>
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
+            <button id="formatJSON-button" onclick="formatJSON()">Format</button>
         </div>
         <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
@@ -414,6 +415,20 @@
             display.appendChild(createTreeElement(key, node, size, fullSize, 0, isLast, isParentArray));
         }
 
+        function formatJSON() {
+            const input = document.getElementById('json-input');
+
+            let json;
+            try {
+                json = JSON.parse(input.value);
+            } catch (e) {
+                alert('Invalid JSON');
+                return;
+            }
+
+            input.value = JSON.stringify(json, null, ' ');
+        }
+
         let jsonString = '';
         function displayJSON() {
             const input = document.getElementById('json-input');
@@ -440,6 +455,7 @@
             display.classList.remove('gone');
             displayJSONButton.innerText = "Reset";
             document.getElementById('hints').classList.remove('gone');
+            document.getElementById('formatJSON-button').classList.add('gone');
         }
         document.getElementById('json-display').classList.add('gone');
         document.getElementById('hints').classList.add('gone');
