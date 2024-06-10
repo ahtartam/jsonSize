@@ -165,7 +165,8 @@
     <script>
         const INDENT_SPACES = 4;
         const BUTTONS_WIDTH = 0;
-        const STRING_LENGTH_LIMIT = 80;
+        const STRING_LENGTH_LIMIT = 160;
+        const STRING_LENGTH_CUT = 80;
 
         function createTreeElement(key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
             const isGroup = typeof value === 'object' && value !== null;
@@ -290,7 +291,7 @@
                 if (typeof value === 'string') {
                     if (value.length > STRING_LENGTH_LIMIT) {
                         valueElement.classList.add('json-string-clickable');
-                        valueStr = `"${value.replace('\n', '\\n').substring(0, STRING_LENGTH_LIMIT - 3)}..."`;
+                        valueStr = `"${value.replace('\n', '\\n').substring(0, STRING_LENGTH_CUT - 3)}..."`;
                         valueElement.onclick = () => {
                             valueElement.classList.remove('json-string-clickable');
                             valueElement.classList.add('json-string');
