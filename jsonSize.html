@@ -289,7 +289,7 @@
                 if (typeof value === 'string') {
                     if (value.length > STRING_LENGTH_LIMIT) {
                         valueElement.classList.add('json-string-clickable');
-                        valueStr = `"${value.substring(0, STRING_LENGTH_LIMIT - 3)}..."`;
+                        valueStr = `"${value.replace('\n', '\\n').substring(0, STRING_LENGTH_LIMIT - 3)}..."`;
                         valueElement.onclick = () => {
                             valueElement.classList.remove('json-string-clickable');
                             valueElement.classList.add('json-string');
@@ -307,10 +307,14 @@
                     }
                     valueStr += (isLast ? '' : ',');
 
-                    const match = jsonString.match(new RegExp(String.raw`${value}`, "g"));
-                    const count = (match || []).length;
-                    if (count > 1) {
-                        addInfo += 'Duplication: ' + count + ' times.';
+                    try {
+                        const match = jsonString.match(new RegExp(String.raw`${value}`, "g"));
+                        const count = (match || []).length;
+                        if (count > 1) {
+                            addInfo += 'Duplication: ' + count + ' times.';
+                        }
+                    } catch (e) {
+                        addInfo += 'Exception: ' + e.toString();
                     }
                 } else {
                     valueElement.classList.add('json-number');
