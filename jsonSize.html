@@ -127,7 +127,11 @@
             margin-left: 15px;
         }
         .found {
-            background-color: #61afef;
+            font-weight: bold;
+            background: #000000;
+            outline-width: thin;
+            outline-color: #00ffed;
+            outline-style: dashed;
         }
     </style>
 </head>
@@ -295,7 +299,7 @@
                 container.appendChild(closureElement);
             } else {
                 const valueElement = document.createElement('span');
-                valueElement.id = `VALUE(${path})`;
+                valueElement.id = `VALUE(${path}/VALUE)`;
                 let valueStr;
                 if (typeof value === 'string') {
                     if (value.length > STRING_LENGTH_LIMIT) {
@@ -454,7 +458,7 @@
                     result += findInJson(value, str, newPath);
                 } else {
                     if (`${value}`.toUpperCase().includes(str)) {
-                        result += `${newPath};\n`;
+                        result += `${newPath}/VALUE;\n`;
                     }
                 }
             }
