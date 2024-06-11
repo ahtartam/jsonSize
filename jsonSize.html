@@ -327,6 +327,14 @@
                         const count = (match || []).length;
                         if (count > 1) {
                             addInfo += 'Duplication: ' + count + ' times.';
+                            infoElement.onclick = () => {
+                                const findInput = document.getElementById('find-input');
+                                const findButton = document.getElementById('find-button');
+                                if (findInput != null && findButton != null) {
+                                    findInput.value = `${value}`;
+                                    findButton.onclick(null);
+                                }
+                            };
                         }
                     } catch (e) {
                         addInfo += 'Exception: ' + e.toString();
@@ -469,9 +477,9 @@
         let lastSearchRequest = '';
         let lastSearchIndex = -1;
         function search() {
-            const input = document.getElementById('find-input');
+            const findInput = document.getElementById('find-input');
             const findButton = document.getElementById('find-button');
-            const request = input.value;
+            const request = findInput.value;
             const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
 
             if (lastSearchRequest !== request) {
