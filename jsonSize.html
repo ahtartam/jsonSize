@@ -26,6 +26,8 @@
             overflow-y: auto;
             white-space: pre-wrap;
             font-family: monospace;
+            /*font-size: 1.3em;*/
+            /*font-size: large;*/
             background: #282c34;
             border: 6px solid #444;
             padding: 20px;
@@ -316,7 +318,7 @@
                 };
 
                 keyElement.oncontextmenu = () => {
-                    focusThis(path, key, value, isLast, mySize, isParentArray);
+                    focusThis(path, key, value);
                     return false;
                 };
 
@@ -499,7 +501,7 @@
             return dotLine(padding + extPadding, fromStart);
         }
 
-        function focusThis(path, key, node, isLast, fullSize, isParentArray) {
+        function focusThis(path, key, node) {
             const display = document.getElementById('json-display');
             jsonString = `{"${key}":${JSON.stringify(node)}}`;
             try {
@@ -509,10 +511,11 @@
                 return;
             }
             display.innerHTML = '';
+            lastSearchRequest = '';
             let size = {
                 value: 0
             };
-            display.appendChild(createTreeElement(path, key, node, size, fullSize, 0, isLast, isParentArray));
+            display.appendChild(createTreeElement('', '', json, size, jsonString.length));
         }
 
         function formatJSON() {
@@ -680,6 +683,7 @@
 
             const display = document.getElementById('json-display');
             display.innerHTML = '';
+            lastSearchRequest = '';
             let sizeOut = {
                 value: 0
             };
