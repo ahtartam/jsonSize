@@ -181,6 +181,7 @@
         <div>
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
             <button id="formatJSON-button" onclick="formatJSON()">Format</button>
+            <button id="toText-button" onclick="toText()">to Text</button>
         </div>
         <div id="search-box">
             <input id="find-input" class="find-input" size="40" value="">
@@ -500,6 +501,13 @@
 
         function focusThis(path, key, node, isLast, fullSize, isParentArray) {
             const display = document.getElementById('json-display');
+            jsonString = `{"${key}":${JSON.stringify(node)}}`;
+            try {
+                json = JSON.parse(jsonString);
+            } catch (e) {
+                alert('Invalid JSON');
+                return;
+            }
             display.innerHTML = '';
             let size = {
                 value: 0
@@ -642,12 +650,25 @@
             return rect.top >= topMargin && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth;
         }
 
+        function toText() {
+            const displayJSONButton = document.getElementById('displayJSON-button');
+            displayJSONButton.innerText = "Display JSON";
+            document.getElementById('formatJSON-button').classList.remove('gone');
+            document.getElementById('toText-button').classList.add('gone');
+            document.getElementById('search-box').classList.add('gone');
+            document.getElementById('hints').classList.add('gone');
+            document.getElementById('json-display').classList.add('gone');
+            const input = document.getElementById('json-input');
+            input.classList.remove('gone');
+
+            input.value = jsonString;
+            formatJSON();
+        }
+
         let json;
         let jsonString = '';
         function displayJSON() {
             const input = document.getElementById('json-input');
-            input.classList.add('gone');
-            const displayJSONButton = document.getElementById('displayJSON-button');
 
             try {
                 json = JSON.parse(input.value);
@@ -655,22 +676,25 @@
                 alert('Invalid JSON');
                 return;
             }
+            jsonString = JSON.stringify(json);
+
             const display = document.getElementById('json-display');
             display.innerHTML = '';
             let sizeOut = {
                 value: 0
             };
-
-            jsonString = JSON.stringify(json);
-            const jsonSize = jsonString.length;
-            display.appendChild(createTreeElement('', '', json, sizeOut, jsonSize));
+            display.appendChild(createTreeElement('', '', json, sizeOut, jsonString.length));
             display.normalize()
             display.classList.remove('gone');
+            input.classList.add('gone');
+            const displayJSONButton = document.getElementById('displayJSON-button');
             displayJSONButton.innerText = "Reset";
             document.getElementById('search-box').classList.remove('gone');
             document.getElementById('hints').classList.remove('gone');
             document.getElementById('formatJSON-button').classList.add('gone');
+            document.getElementById('toText-button').classList.remove('gone');
         }
+        document.getElementById('toText-button').classList.add('gone');
         document.getElementById('json-display').classList.add('gone');
         document.getElementById('search-box').classList.add('gone');
         document.getElementById('hints').classList.add('gone');
