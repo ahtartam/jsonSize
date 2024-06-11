@@ -236,11 +236,10 @@
             const keyElement = document.createElement('span');
             keyElement.id = `KEY(${path})`;
             const marginElement = document.createElement('span');
-            marginElement.classList.add('json-margin', 'no-select');
+            marginElement.classList.add('json-margin');
             const infoMarginElement = document.createElement('span');
-            infoMarginElement.classList.add('json-margin', 'no-select');
+            infoMarginElement.classList.add('json-margin');
             const infoElement = document.createElement('span');
-            infoElement.classList.add('no-select');
 
             const keyStr = key ? `${key}` : '';
             const delimStr = key ? `: ` : '';
@@ -261,7 +260,7 @@
                 const closureInlineElement = document.createElement('span');
                 closureInlineElement.classList.add('json-border');
                 const closureMarginElement = document.createElement('span');
-                closureMarginElement.classList.add('json-margin', 'no-select');
+                closureMarginElement.classList.add('json-margin');
                 const closureElement = document.createElement('span');
                 closureElement.classList.add('json-border');
 
