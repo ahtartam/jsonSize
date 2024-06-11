@@ -88,11 +88,31 @@
         .json-info-group-tiny {
             color: #4f7640;
         }
+        .json-duplication {
+            cursor: pointer;
+            color: #ffde00;
+            font-weight: bold;
+            background: #262f40;
+            margin-left: 16px;
+        }
+        .json-duplication:hover {
+            color: #338cff;
+        }
         .gone {
             display: none;
         }
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Стандартное свойство */
+        }
         .invisible {
             color: transparent;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Стандартное свойство */
         }
         .hints {
             line-height: 6px;
@@ -216,10 +236,11 @@
             const keyElement = document.createElement('span');
             keyElement.id = `KEY(${path})`;
             const marginElement = document.createElement('span');
-            marginElement.classList.add('json-margin');
+            marginElement.classList.add('json-margin', 'no-select');
             const infoMarginElement = document.createElement('span');
-            infoMarginElement.classList.add('json-margin');
+            infoMarginElement.classList.add('json-margin', 'no-select');
             const infoElement = document.createElement('span');
+            infoElement.classList.add('no-select');
 
             const keyStr = key ? `${key}` : '';
             const delimStr = key ? `: ` : '';
@@ -229,8 +250,6 @@
 
             let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
             marginElement.textContent = marginBegin
-
-            let addInfo = '';
 
             if (isGroup) {
                 keyElement.classList.add('json-key-group');
@@ -242,7 +261,7 @@
                 const closureInlineElement = document.createElement('span');
                 closureInlineElement.classList.add('json-border');
                 const closureMarginElement = document.createElement('span');
-                closureMarginElement.classList.add('json-margin');
+                closureMarginElement.classList.add('json-margin', 'no-select');
                 const closureElement = document.createElement('span');
                 closureElement.classList.add('json-border');
 
@@ -323,7 +342,11 @@
             } else {
                 const valueElement = document.createElement('span');
                 valueElement.id = `VALUE(${path}/VALUE)`;
+                const duplicationElement = document.createElement('span');
+                duplicationElement.classList.add('json-duplication', 'no-select');
+
                 let valueStr;
+                let duplicationStr = '';
                 if (typeof value === 'string') {
                     if (value.length > STRING_LENGTH_LIMIT) {
                         valueElement.classList.add('json-string-clickable');
@@ -348,8 +371,8 @@
                     try {
                         const count = countOf(jsonString, `${value}`)
                         if (count > 1) {
-                            addInfo += 'Duplication: ' + count + ' times.';
-                            infoElement.onclick = () => {
+                            duplicationStr += 'Duplication: ' + count + ' times.';
+                            duplicationElement.onclick = () => {
                                 const findInput = document.getElementById('find-input');
                                 const findButton = document.getElementById('find-button');
                                 if (findInput != null && findButton != null) {
@@ -359,7 +382,7 @@
                             };
                         }
                     } catch (e) {
-                        addInfo += 'Exception: ' + e.toString();
+                        duplicationStr += 'Exception: ' + e.toString();
                     }
                 } else {
                     valueElement.classList.add('json-number');
@@ -377,11 +400,16 @@
                 container.appendChild(valueElement);
                 container.appendChild(infoMarginElement);
                 container.appendChild(infoElement);
+
+                if (duplicationStr.length > 0) {
+                    duplicationElement.textContent = duplicationStr;
+                    container.appendChild(duplicationElement);
+                }
             }
 
             const infoBytes = formatBytes(mySize);
             infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
-            infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize) + (addInfo ==='' ? '' : ' | ' + addInfo);
+            infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize);
             setInfoClass(infoElement, mySize, fullSize);
 
             return container;
