@@ -126,6 +126,9 @@
         .find-button {
             margin-left: 15px;
         }
+        .found {
+            background-color: #61afef;
+        }
     </style>
 </head>
 <body>
@@ -500,6 +503,21 @@
                                 keyItem.onclick(null);
                             }
                         }
+                    }
+                }
+
+                const lastFounded = document.getElementsByClassName('found');
+                for (let i = 0; i < lastFounded.length; i++) {
+                    lastFounded[i].classList.remove('found');
+                }
+
+                const valueItem = document.getElementById(`VALUE(${result})`);
+                if (valueItem !== null) {
+                    valueItem.classList.add('found');
+                } else {
+                    const keyItem = document.getElementById(`KEY(${result})`);
+                    if (keyItem !== null) {
+                        keyItem.classList.add('found');
                     }
                 }
             }
