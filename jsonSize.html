@@ -346,8 +346,7 @@
                     valueStr += (isLast ? '' : ',');
 
                     try {
-                        const match = jsonString.match(new RegExp(String.raw`${value}`, "g"));
-                        const count = (match || []).length;
+                        const count = countOf(jsonString, `${value}`)
                         if (count > 1) {
                             addInfo += 'Duplication: ' + count + ' times.';
                             infoElement.onclick = () => {
@@ -387,6 +386,27 @@
 
             return container;
         }
+
+        function countOf(string, substring) {
+            let count = -1;
+            let index = -1;
+            do {
+                index = string.indexOf(substring, index + 1);
+                count++;
+            } while (index >= 0);
+
+            return count;
+        }
+
+        // console.log(`${countOf('как это на второй год это остаюсь', 'это') === 2}`);
+        // console.log(`${countOf('qwertyqwerty', 'qwerty') === 2}`);
+        // console.log(`${countOf('qwertyqwertyqwerty', 'qwerty') === 3}`);
+        // console.log(`${countOf('qwertyqwertyqwerty', 'q')===3}`);
+        // console.log(`${countOf('как это на второй год это остаюсь', 'это')===2}`);
+        // console.log(`${countOf('этоэтоэто', 'это')===3}`);
+        // console.log(`${countOf('ononono', 'ono')===3}`);
+        // console.log(`${countOf('ononono', 'onon')===2}`);
+        // console.log(`${countOf('nonono', 'onon')===1}`);
 
         function setInfoClass(infoElement, mySize, fullSize) {
             if (mySize > fullSize / 2) {
