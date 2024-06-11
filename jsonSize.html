@@ -463,6 +463,7 @@
         let lastSearchIndex = -1;
         function search() {
             const input = document.getElementById('find-input');
+            const findButton = document.getElementById('find-button');
             const request = input.value;
             const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
 
@@ -474,6 +475,11 @@
             lastSearchIndex++;
             if (results.length <= lastSearchIndex) {
                 lastSearchIndex = 0;
+            }
+            if (results.length <= 1) {
+                findButton.innerText = 'Search';
+            } else {
+                findButton.innerText = `Search (${lastSearchIndex + 1}/${results.length})`;
             }
 
             if (results.length > lastSearchIndex) {
