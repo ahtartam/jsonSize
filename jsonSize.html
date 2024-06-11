@@ -451,8 +451,7 @@
                     result += findInJson(value, str, newPath);
                 } else {
                     if (`${value}`.toUpperCase().includes(str)) {
-                        // result += `${newPath};\n`;
-                        result += `${path};\n`;
+                        result += `${newPath};\n`;
                     }
                 }
             }
@@ -494,8 +493,6 @@
                             if (isCollapsed) {
                                 keyItem.onclick(null);
                             }
-                        } else {
-                            keyItem.onclick(null);
                         }
                     }
                 }
