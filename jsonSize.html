@@ -8,23 +8,31 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
+            padding: 0;
+            background-color: #999;
         }
         .json-input {
-            max-width: 99%;
+            max-width: 98%;
             height: 700px;
+            overflow-y: auto;
+            border: 6px solid #444;
+            border-radius: 18px;
+            margin: 6px auto;
+            outline-width: medium;
+            outline-color: #e2e2e2;
+            outline-style: groove;
         }
         .json-container {
+            overflow-y: auto;
             white-space: pre-wrap;
             font-family: monospace;
             background: #282c34;
-            border: 1px solid #444;
+            border: 6px solid #444;
             padding: 20px;
-            border-radius: 8px;
+            border-radius: 18px;
             color: #f8f8f2;
-            max-width: 98%;
-            margin: 0 auto;
+            max-width: 97%;
+            margin: 6px auto;
             outline-width: medium;
             outline-color: #e2e2e2;
             outline-style: groove;
@@ -88,18 +96,23 @@
         }
         .hints {
             line-height: 6px;
-            padding-left: 16px;
-            padding-right: 16px;
-            margin-bottom: 8px;
+            padding: 0px 16px;
+            margin: 0;
             background: #cccccc;
             outline-width: medium;
             outline-color: #e2e2e2;
             outline-style: groove;
         }
         .container {
+            background-color: #cccccccc;
+            border: 2px solid #7b7b7b;
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 10px 15px;
         }
         textarea {
             width: 100%;
@@ -112,7 +125,6 @@
         }
         button {
             padding: 10px 15px;
-            margin-bottom: 20px;
             background-color: #61afef;
             color: white;
             border: none;
@@ -123,19 +135,45 @@
         button:hover {
             background-color: #4a90e2;
         }
+        .find-input {
+            padding: 10px 6px;
+        }
         .find-button {
             margin-left: 15px;
         }
         .found {
-            font-weight: bold;
-            background: #000000;
             outline-width: thin;
             outline-color: #00ffed;
             outline-style: dashed;
         }
+        .found_current {
+            font-weight: bold;
+            color: white;
+            background: #000000;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            outline-style: solid;
+        }
     </style>
 </head>
 <body>
+    <div class="container">
+        <div>
+            <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
+            <button id="formatJSON-button" onclick="formatJSON()">Format</button>
+        </div>
+        <div id="search-box">
+            <input id="find-input" class="find-input" size="40" value="">
+            <button id="find-button" class="find-button" onclick="search()">Search</button>
+        </div>
+        <div id="hints" class="hints">
+            <p><b>Left click</b> - expand/collapse the node.</p>
+            <p><b>Right click</b> - focus on the selected node.</p>
+        </div>
+    </div>
+
+    <div id="json-display" class="json-container"></div>
+
     <textarea id="json-input" class="json-input" placeholder="Paste your JSON here...">{
     "name": "John",
     "age": 30,
@@ -160,21 +198,6 @@
         }
     }
 }</textarea>
-    <div class="container">
-        <div>
-            <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
-            <button id="formatJSON-button" onclick="formatJSON()">Format</button>
-        </div>
-        <div id="search-box">
-            <input id="find-input" size="40" value="">
-            <button id="find-button" class="find-button" onclick="search()">Search</button>
-        </div>
-        <div id="hints" class="hints">
-            <p><b>Left click</b> - expand/collapse the node.</p>
-            <p><b>Right click</b> - focus on the selected node.</p>
-        </div>
-    </div>
-    <div id="json-display" class="json-container"></div>
 
     <script>
         const INDENT_SPACES = 4;
@@ -480,10 +503,21 @@
             const findInput = document.getElementById('find-input');
             const findButton = document.getElementById('find-button');
             const request = findInput.value;
+            if (request.length === 0) return;
             const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
 
             if (lastSearchRequest !== request) {
                 lastSearchIndex = -1;
+
+                const lastFound = document.getElementsByClassName('found');
+                for (let i = 0; i < lastFound.length; i++) {
+                    try {
+                        lastFound[i].classList.remove('found_current', 'found');
+                        lastFound[i].classList.remove('found_current', 'found');
+                        lastFound[i].classList.remove('found_current', 'found');
+                        lastFound[i].classList.remove('found_current', 'found');
+                    } catch (e) {}
+                }
             }
             lastSearchRequest = request;
 
@@ -498,37 +532,53 @@
             }
 
             if (results.length > lastSearchIndex) {
-                const result = results[lastSearchIndex];
+                for (let i = 0; i < results.length; i++) {
+                    markAsFound(results[i], i === lastSearchIndex);
+                }
+            }
+        }
 
-                const pathItems = result.split('/');
-                let path = '';
-                for (const i in pathItems) {
-                    if (i === 0 || i === '0') continue;
+        function markAsFound(path, isCurrent) {
+            const pathItems = path.split('/');
+            let subPath = '';
+            for (const i in pathItems) {
+                if (i === 0 || i === '0') continue;
 
-                    path += `/${pathItems[i]}`;
-                    const keyItem = document.getElementById(`KEY(${path})`);
-                    const groupItem = document.getElementById(`GROUP(${path})`);
-                    if (keyItem != null) {
-                        if (groupItem != null) {
-                            const isCollapsed = groupItem.classList.contains('gone');
-                            if (isCollapsed) {
-                                keyItem.onclick(null);
-                            }
+                subPath += `/${pathItems[i]}`;
+                const keyItem = document.getElementById(`KEY(${subPath})`);
+                const groupItem = document.getElementById(`GROUP(${subPath})`);
+                if (keyItem != null) {
+                    if (isCurrent && groupItem != null) {
+                        const isCollapsed = groupItem.classList.contains('gone');
+                        if (isCollapsed) {
+                            keyItem.onclick(null);
                         }
                     }
                 }
+            }
 
-                const lastFounded = document.getElementsByClassName('found');
-                for (let i = 0; i < lastFounded.length; i++) {
-                    lastFounded[i].classList.remove('found');
+            if (isCurrent) {
+                const lastFoundCurrent = document.getElementsByClassName('found_current');
+                for (let i = 0; i < lastFoundCurrent.length; i++) {
+                    lastFoundCurrent[i].classList.remove('found_current');
                 }
+            }
 
-                const valueItem = document.getElementById(`VALUE(${result})`);
-                if (valueItem !== null) {
-                    valueItem.classList.add('found');
+            const valueItem = document.getElementById(`VALUE(${path})`);
+            if (valueItem !== null) {
+                if (isCurrent) {
+                    valueItem.classList.add('found', 'found_current');
+                    valueItem.scrollIntoView({block: 'center'});
                 } else {
-                    const keyItem = document.getElementById(`KEY(${result})`);
-                    if (keyItem !== null) {
+                    valueItem.classList.add('found');
+                }
+            } else {
+                const keyItem = document.getElementById(`KEY(${path})`);
+                if (keyItem !== null) {
+                    if (isCurrent) {
+                        keyItem.classList.add('found', 'found_current');
+                        keyItem.scrollIntoView({block: 'center'});
+                    } else {
                         keyItem.classList.add('found');
                     }
                 }
