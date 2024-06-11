@@ -123,6 +123,16 @@
         button:hover {
             background-color: #4a90e2;
         }
+        .find-button {
+            margin-left: 15px;
+        }
+        .found {
+            font-weight: bold;
+            background: #000000;
+            outline-width: thin;
+            outline-color: #00ffed;
+            outline-style: dashed;
+        }
     </style>
 </head>
 <body>
@@ -155,6 +165,10 @@
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
             <button id="formatJSON-button" onclick="formatJSON()">Format</button>
         </div>
+        <div id="search-box">
+            <input id="find-input" size="40" value="">
+            <button id="find-button" class="find-button" onclick="search()">Search</button>
+        </div>
         <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
             <p><b>Right click</b> - focus on the selected node.</p>
@@ -168,7 +182,7 @@
         const STRING_LENGTH_LIMIT = 160;
         const STRING_LENGTH_CUT = 80;
 
-        function createTreeElement(key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
+        function createTreeElement(path, key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
             const isGroup = typeof value === 'object' && value !== null;
             const isArray = Array.isArray(value);
 
@@ -177,6 +191,7 @@
 
             const container = document.createElement('div');
             const keyElement = document.createElement('span');
+            keyElement.id = `KEY(${path})`;
             const marginElement = document.createElement('span');
             marginElement.classList.add('json-margin');
             const infoMarginElement = document.createElement('span');
@@ -200,6 +215,7 @@
                 const borderElement = document.createElement('span');
                 borderElement.classList.add('json-border');
                 const valueElement = document.createElement('div');
+                valueElement.id = `GROUP(${path})`;
                 const closureInlineElement = document.createElement('span');
                 closureInlineElement.classList.add('json-border');
                 const closureMarginElement = document.createElement('span');
@@ -217,7 +233,8 @@
                     for (const k in value) {
                         childSize.value = 0;
                         const isLastChild = i === count - 1;
-                        const child = createTreeElement(k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
+                        const newPath = `${path}/${k}`;
+                        const child = createTreeElement(newPath, k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
                         valueChilds.push(pair(childSize.value, child));
                         i++;
                     }
@@ -228,41 +245,36 @@
                         });
                 }
 
-                function doExpand() {
-                    valueElement.classList.remove('gone');
-                    closureInlineElement.classList.add('invisible');
-                    closureMarginElement.classList.remove('gone');
-                    closureElement.classList.remove('gone');
-                }
-                function doCollapse() {
-                    valueElement.classList.add('gone');
-                    closureInlineElement.classList.remove('invisible');
-                    closureMarginElement.classList.add('gone');
-                    closureElement.classList.add('gone');
+                function onExpandCollapse(toExpand) {
+                    if (toExpand) {
+                        valueElement.classList.remove('gone');
+                        closureMarginElement.classList.remove('gone');
+                        closureElement.classList.remove('gone');
+                        closureInlineElement.classList.add('invisible');
+                    } else {
+                        valueElement.classList.add('gone');
+                        closureMarginElement.classList.add('gone');
+                        closureElement.classList.add('gone');
+                        closureInlineElement.classList.remove('invisible');
+                    }
                 }
                 // ---
 
                 if (level === 0) {
                     appendValueChilds();
-                    doExpand();
-                } else {
-                    doCollapse();
                 }
+                onExpandCollapse(level === 0);
 
                 keyElement.onclick = () => {
                     const toExpand = valueElement.classList.contains('gone');
-                    if (toExpand) {
-                        if (!valueElement.hasChildNodes()) {
-                            appendValueChilds();
-                        }
-                        doExpand();
-                    } else {
-                        doCollapse();
+                    if (toExpand && !valueElement.hasChildNodes()) {
+                        appendValueChilds();
                     }
+                    onExpandCollapse(toExpand);
                 };
 
                 keyElement.oncontextmenu = () => {
-                    focusThis(key, value, isLast, mySize, isParentArray);
+                    focusThis(path, key, value, isLast, mySize, isParentArray);
                     return false;
                 };
 
@@ -287,6 +299,7 @@
                 container.appendChild(closureElement);
             } else {
                 const valueElement = document.createElement('span');
+                valueElement.id = `VALUE(${path}/VALUE)`;
                 let valueStr;
                 if (typeof value === 'string') {
                     if (value.length > STRING_LENGTH_LIMIT) {
@@ -368,8 +381,8 @@
         }
 
         function calculateJsonSize(jsonData) {
-            const jsonString = JSON.stringify(jsonData);
-            return jsonString.length;
+            const jsonStr = JSON.stringify(jsonData);
+            return jsonStr.length;
         }
 
         function formatBytes(bytes) {
@@ -407,13 +420,13 @@
             return dotLine(padding + extPadding, fromStart);
         }
 
-        function focusThis(key, node, isLast, fullSize, isParentArray) {
+        function focusThis(path, key, node, isLast, fullSize, isParentArray) {
             const display = document.getElementById('json-display');
             display.innerHTML = '';
             let size = {
                 value: 0
             };
-            display.appendChild(createTreeElement(key, node, size, fullSize, 0, isLast, isParentArray));
+            display.appendChild(createTreeElement(path, key, node, size, fullSize, 0, isLast, isParentArray));
         }
 
         function formatJSON() {
@@ -430,13 +443,97 @@
             input.value = JSON.stringify(json, null, ' ');
         }
 
+        function findInJson(json, str, path = '') {
+            let result = '';
+            const isArray = Array.isArray(json);
+
+            for (const key in json) {
+                const newPath = `${path}/${key}`;
+                const value = json[key];
+                if (!isArray && key.toUpperCase().includes(str)) {
+                    result += `${newPath};\n`;
+                }
+                const isGroup = typeof value === 'object' && value !== null;
+                if (isGroup) {
+                    result += findInJson(value, str, newPath);
+                } else {
+                    if (`${value}`.toUpperCase().includes(str)) {
+                        result += `${newPath}/VALUE;\n`;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        let lastSearchRequest = '';
+        let lastSearchIndex = -1;
+        function search() {
+            const input = document.getElementById('find-input');
+            const findButton = document.getElementById('find-button');
+            const request = input.value;
+            const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
+
+            if (lastSearchRequest !== request) {
+                lastSearchIndex = -1;
+            }
+            lastSearchRequest = request;
+
+            lastSearchIndex++;
+            if (results.length <= lastSearchIndex) {
+                lastSearchIndex = 0;
+            }
+            if (results.length <= 1) {
+                findButton.innerText = 'Search';
+            } else {
+                findButton.innerText = `Search (${lastSearchIndex + 1}/${results.length})`;
+            }
+
+            if (results.length > lastSearchIndex) {
+                const result = results[lastSearchIndex];
+
+                const pathItems = result.split('/');
+                let path = '';
+                for (const i in pathItems) {
+                    if (i === 0 || i === '0') continue;
+
+                    path += `/${pathItems[i]}`;
+                    const keyItem = document.getElementById(`KEY(${path})`);
+                    const groupItem = document.getElementById(`GROUP(${path})`);
+                    if (keyItem != null) {
+                        if (groupItem != null) {
+                            const isCollapsed = groupItem.classList.contains('gone');
+                            if (isCollapsed) {
+                                keyItem.onclick(null);
+                            }
+                        }
+                    }
+                }
+
+                const lastFounded = document.getElementsByClassName('found');
+                for (let i = 0; i < lastFounded.length; i++) {
+                    lastFounded[i].classList.remove('found');
+                }
+
+                const valueItem = document.getElementById(`VALUE(${result})`);
+                if (valueItem !== null) {
+                    valueItem.classList.add('found');
+                } else {
+                    const keyItem = document.getElementById(`KEY(${result})`);
+                    if (keyItem !== null) {
+                        keyItem.classList.add('found');
+                    }
+                }
+            }
+        }
+
+        let json;
         let jsonString = '';
         function displayJSON() {
             const input = document.getElementById('json-input');
             input.classList.add('gone');
             const displayJSONButton = document.getElementById('displayJSON-button');
 
-            let json;
             try {
                 json = JSON.parse(input.value);
             } catch (e) {
@@ -451,14 +548,16 @@
 
             jsonString = JSON.stringify(json);
             const jsonSize = jsonString.length;
-            display.appendChild(createTreeElement('', json, sizeOut, jsonSize));
+            display.appendChild(createTreeElement('', '', json, sizeOut, jsonSize));
             display.normalize()
             display.classList.remove('gone');
             displayJSONButton.innerText = "Reset";
+            document.getElementById('search-box').classList.remove('gone');
             document.getElementById('hints').classList.remove('gone');
             document.getElementById('formatJSON-button').classList.add('gone');
         }
         document.getElementById('json-display').classList.add('gone');
+        document.getElementById('search-box').classList.add('gone');
         document.getElementById('hints').classList.add('gone');
     </script>
 </body>
