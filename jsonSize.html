@@ -10,6 +10,7 @@
             margin: 0;
             padding: 0;
             background-color: #999;
+            /*width: 300vw;*/
         }
         .json-input {
             max-width: 98%;
@@ -18,9 +19,7 @@
             border: 6px solid #444;
             border-radius: 18px;
             margin: 6px auto;
-            outline-width: medium;
-            outline-color: #e2e2e2;
-            outline-style: groove;
+            outline: #e2e2e2 groove medium;
         }
         .json-container {
             overflow-y: auto;
@@ -34,10 +33,8 @@
             border-radius: 18px;
             color: #f8f8f2;
             max-width: 97%;
-            margin: 6px auto;
-            outline-width: medium;
-            outline-color: #e2e2e2;
-            outline-style: groove;
+            margin: 0 auto 6px;
+            outline: #e2e2e2 groove medium;
         }
         .json-key-group {
             cursor: pointer;
@@ -51,6 +48,14 @@
         .json-border {
             color: #ff989f;
             font-weight: bold;
+        }
+        .json-border-clickable {
+            cursor: pointer;
+            color: #ff989f;
+            font-weight: bold;
+        }
+        .json-border-clickable:hover {
+            color: #338cff;
         }
         .json-key-value {
             color: #7da762;
@@ -118,12 +123,10 @@
         }
         .hints {
             line-height: 6px;
-            padding: 0px 16px;
+            padding: 0 16px;
             margin: 0;
             background: #cccccc;
-            outline-width: medium;
-            outline-color: #e2e2e2;
-            outline-style: groove;
+            outline: #e2e2e2 groove medium;
         }
         .container {
             background-color: #cccccccc;
@@ -159,14 +162,13 @@
         }
         .find-input {
             padding: 10px 6px;
+            margin-left: 35px;
         }
         .find-button {
             margin-left: 15px;
         }
         .found {
-            outline-width: thin;
-            outline-color: #00ffed;
-            outline-style: dashed;
+            outline: #00ffed dashed thin;
         }
         .found_current {
             font-weight: bold;
@@ -175,6 +177,26 @@
             padding-top: 2px;
             padding-bottom: 2px;
             outline-style: solid;
+        }
+        .filename {
+            width: 400px;
+            cursor: pointer;
+            color: #1654a3;
+            font-weight: bold;
+            padding: 10px 16px;
+            background: #cccccc;
+            outline: #e2e2e2 groove medium;
+        }
+        .filename:hover {
+            color: #338cff;
+        }
+        .path {
+            color: #1654a3;
+            font-weight: bold;
+            padding-left: 20px;
+            padding-top: 0;
+            padding-bottom: 0;
+            margin: 0;
         }
     </style>
 </head>
@@ -189,11 +211,18 @@
             <input id="find-input" class="find-input" size="40" value="">
             <button id="find-button" class="find-button" onclick="search()">Search</button>
         </div>
+        <div>
+            <input id="filename" class="filename" type="file" onchange="loadFile()"/>
+        </div>
+        <div></div>
+        <div></div>
         <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
             <p><b>Right click</b> - focus on the selected node.</p>
         </div>
     </div>
+
+    <p id="path" class="path">&nbsp;</p>
 
     <div id="json-display" class="json-container"></div>
 
@@ -253,6 +282,11 @@
             let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
             marginElement.textContent = marginBegin
 
+            keyElement.onmousemove = () => {
+                const pathElement = document.getElementById('path');
+                pathElement.innerText = path;
+            }
+
             if (isGroup) {
                 keyElement.classList.add('json-key-group');
                 keyElement.textContent = keyStr;
@@ -265,7 +299,7 @@
                 const closureMarginElement = document.createElement('span');
                 closureMarginElement.classList.add('json-margin');
                 const closureElement = document.createElement('span');
-                closureElement.classList.add('json-border');
+                closureElement.classList.add('json-border-clickable');
 
                 function appendValueChilds() {
                     const count = Object.keys(value).length;
@@ -316,6 +350,9 @@
                     }
                     onExpandCollapse(toExpand);
                 };
+                borderElement.onclick = keyElement.onclick;
+                closureInlineElement.onclick = keyElement.onclick;
+                closureElement.onclick = keyElement.onclick;
 
                 keyElement.oncontextmenu = () => {
                     focusThis(path, key, value);
@@ -327,9 +364,9 @@
                 beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
 
                 borderElement.textContent = delimStr + borderStartStr;
-                closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + (isLast ? '' : ',');
+                closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + ',';
                 closureMarginElement.textContent = dotLine(indentSpaces);
-                closureElement.textContent = (isArray ? ']' : '}') + (isLast ? '' : ',');
+                closureElement.textContent = (isArray ? ']' : '}') + ',';
 
                 // ---
                 container.appendChild(marginElement);
@@ -388,7 +425,7 @@
                     }
                 } else {
                     valueElement.classList.add('json-number');
-                    valueStr = value + (isLast ? '' : ',');
+                    valueStr = value + ',';
                 }
                 beforeInfoLen += valueStr.length;
 
@@ -407,6 +444,8 @@
                     duplicationElement.textContent = duplicationStr;
                     container.appendChild(duplicationElement);
                 }
+
+                valueElement.onmousemove = keyElement.onmousemove;
             }
 
             const infoBytes = formatBytes(mySize);
@@ -428,12 +467,11 @@
             return count;
         }
 
-        // console.log(`${countOf('как это на второй год это остаюсь', 'это') === 2}`);
         // console.log(`${countOf('qwertyqwerty', 'qwerty') === 2}`);
         // console.log(`${countOf('qwertyqwertyqwerty', 'qwerty') === 3}`);
         // console.log(`${countOf('qwertyqwertyqwerty', 'q')===3}`);
-        // console.log(`${countOf('как это на второй год это остаюсь', 'это')===2}`);
-        // console.log(`${countOf('этоэтоэто', 'это')===3}`);
+        // console.log(`${countOf('qwerty json huge info qwerty json info', 'json') === 2}`);
+        // console.log(`${countOf('infoinfoinfo', 'info')===3}`);
         // console.log(`${countOf('ononono', 'ono')===3}`);
         // console.log(`${countOf('ononono', 'onon')===2}`);
         // console.log(`${countOf('nonono', 'onon')===1}`);
@@ -653,7 +691,7 @@
             return rect.top >= topMargin && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth;
         }
 
-        function toText() {
+        function switchToTextView() {
             const displayJSONButton = document.getElementById('displayJSON-button');
             displayJSONButton.innerText = "Display JSON";
             document.getElementById('formatJSON-button').classList.remove('gone');
@@ -663,9 +701,41 @@
             document.getElementById('json-display').classList.add('gone');
             const input = document.getElementById('json-input');
             input.classList.remove('gone');
+        }
 
+        function switchToJsonView() {
+            const input = document.getElementById('json-input');
+            const display = document.getElementById('json-display');
+            display.classList.remove('gone');
+            input.classList.add('gone');
+            const displayJSONButton = document.getElementById('displayJSON-button');
+            displayJSONButton.innerText = "Reset";
+            document.getElementById('search-box').classList.remove('gone');
+            document.getElementById('hints').classList.remove('gone');
+            document.getElementById('formatJSON-button').classList.add('gone');
+            document.getElementById('toText-button').classList.remove('gone');
+        }
+
+        function toText() {
+            switchToTextView();
+            const input = document.getElementById('json-input');
             input.value = jsonString;
             formatJSON();
+        }
+
+        function loadFile() {
+            const fileInput = document.getElementById("filename");
+            const fileContent = document.getElementById("json-input");
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    fileContent.value = e.target.result;
+                };
+                reader.readAsText(fileInput.files[0]);
+                switchToTextView();
+            } else {
+                alert("Пожалуйста, выберите файл.");
+            }
         }
 
         let json;
@@ -688,15 +758,9 @@
                 value: 0
             };
             display.appendChild(createTreeElement('', '', json, sizeOut, jsonString.length));
-            display.normalize()
-            display.classList.remove('gone');
-            input.classList.add('gone');
-            const displayJSONButton = document.getElementById('displayJSON-button');
-            displayJSONButton.innerText = "Reset";
-            document.getElementById('search-box').classList.remove('gone');
-            document.getElementById('hints').classList.remove('gone');
-            document.getElementById('formatJSON-button').classList.add('gone');
-            document.getElementById('toText-button').classList.remove('gone');
+            display.normalize();
+
+            switchToJsonView();
         }
         document.getElementById('toText-button').classList.add('gone');
         document.getElementById('json-display').classList.add('gone');
