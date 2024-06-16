@@ -8,7 +8,7 @@
     <style>
         html {
             font-family: Arial, sans-serif;
-            font-size: 1.2em;
+            font-size: 1.3em;
             background-color: #999;
             overflow: hidden;
         }
@@ -38,7 +38,7 @@
         .top-panel {
             width: 100vw;
             font-size: 0.7rem;
-            background-color: #cccccccc;
+            background-color: #ccc;
             outline: #e2e2e2 groove medium;
             display: flex;
             align-items: center;
@@ -74,7 +74,6 @@
             font-weight: bold;
             padding: 0.9rem;
             margin: 0 0 0 0.5rem;
-            background: #cccccc;
             outline: #e2e2e2 groove medium;
         }
 
@@ -91,7 +90,6 @@
             align-items: center;
             padding: 0 1rem;
             margin: 0;
-            background: #cccccc;
             outline: #e2e2e2 groove medium;
         }
 
@@ -128,36 +126,9 @@
             border-color: #1111c6;
         }
 
-        .gone {
-            display: none;
-        }
-
-        .no-select {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Стандартное свойство */
-        }
-
-        .invisible {
-            color: transparent;
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Стандартное свойство */
-        }
-
-        .found {
-            outline: #00ffed dashed thin;
-        }
-
-        .found_current {
-            font-weight: bold;
-            color: white;
-            background: #000000;
-            padding-top: 2px;
-            padding-bottom: 2px;
-            outline-style: solid;
+        .json-container {
+            width: fit-content;
+            min-width: 96.4vw;
         }
 
         .json-margin {
@@ -168,15 +139,24 @@
             cursor: pointer;
             color: #ffe2e3;
             font-weight: bold;
-            background: #262f40;
         }
 
         .json-key-group:hover {
-            color: #338cff;
+            color: #62a6ff;
         }
 
         .json-key-value {
+            cursor: pointer;
             color: #7da762;
+        }
+
+        .json-key-value:hover {
+            font-weight: bold;
+        }
+
+        .json-key-selected {
+            background: #000;
+            outline: #FFF dotted thin;
         }
 
         .json-border {
@@ -212,10 +192,6 @@
             color: #338cff;
         }
 
-        .json-info-group {
-            color: #777777;
-        }
-
         .json-info-group-huge {
             color: #ff0000;
             font-weight: bold;
@@ -241,12 +217,43 @@
             cursor: pointer;
             color: #ffde00;
             font-weight: bold;
-            background: #262f40;
             margin-left: 16px;
         }
 
         .json-duplication:hover {
             color: #338cff;
+        }
+
+        .found {
+            outline: #00ffed dashed thin;
+        }
+
+        .found_current {
+            font-weight: bold;
+            color: white;
+            background: #000;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            outline-style: solid;
+        }
+
+        .gone {
+            display: none;
+        }
+
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Стандартное свойство */
+        }
+
+        .invisible {
+            color: transparent;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Стандартное свойство */
         }
     </style>
 </head>
@@ -309,6 +316,7 @@
     const BUTTONS_WIDTH = 0;
     const STRING_LENGTH_LIMIT = 160;
     const STRING_LENGTH_CUT = 80;
+    const STRING_SUB_LENGTH = STRING_LENGTH_CUT;
 
     function pair(a, b) {
         return {first: a, second: b};
@@ -345,6 +353,20 @@
 
     function formatPercent(bytes, fullSize) {
         return (bytes * 100.0 / fullSize).toFixed(2) + '%';
+    }
+
+    function getShortString(str) {
+        return `"${str.replace('\n', '\\n').substring(0, STRING_LENGTH_CUT - 3)}..."`
+    }
+
+    function getFormattedString(str, margin = '') {
+        let result = [];
+        for (let i = 0; i < str.length; i += STRING_SUB_LENGTH) {
+            result.push(str.slice(i, i + STRING_SUB_LENGTH));
+        }
+        return '"' + result.slice(0, result.length - 1).map((it) => {
+            return it + '\n' + margin;
+        }).join('') + result[result.length - 1] + '"';
     }
 
     function getParentPath(path) {
@@ -386,6 +408,10 @@
 
     function getValueKey(path) {
         return `VALUE(${path}/VALUE)`;
+    }
+
+    function findRootElement(path) {
+        return document.getElementById(getRootId(path));
     }
 
     function findKeyElement(path) {
@@ -458,21 +484,24 @@
             keyElement.onclick = () => {
                 const toExpand = isCollapsed(valueElement);
                 makeExpandCollapse(toExpand, path, value, fullSize, level, isArray, valueElement, closureElements, closureElementsNegative);
-                makeKeySelected(path);
+                markKeySelected(path);
             };
             borderElement.onclick = keyElement.onclick;
             closureInlineElement.onclick = keyElement.onclick;
             closureElement.onclick = keyElement.onclick;
+            marginElement.onclick = keyElement.onclick;
+            infoMarginElement.onclick = keyElement.onclick;
+            infoElement.onclick = keyElement.onclick;
 
             keyElement.oncontextmenu = () => {
                 focusThis(path, key, value);
-                makeKeySelected(path);
+                markKeySelected(path);
                 return false;
             };
 
             const childCount = Object.keys(value).length;
             const borderStartStr = isArray ? '[' : '{';
-            beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
+            beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + 2/*},*/;
 
             borderElement.textContent = delimStr + borderStartStr;
             closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + ',';
@@ -495,23 +524,34 @@
             const duplicationElement = document.createElement('span');
             duplicationElement.classList.add('json-duplication', 'no-select');
 
+            keyElement.onclick = () => {
+                markKeySelected(path);
+            };
+            valueElement.onclick = keyElement.onclick;
+            marginElement.onclick = keyElement.onclick;
+            infoMarginElement.onclick = keyElement.onclick;
+            infoElement.onclick = keyElement.onclick;
+
             let valueStr;
             let duplicationStr = '';
             if (typeof value === 'string') {
                 if (value.length > STRING_LENGTH_LIMIT) {
                     valueElement.classList.add('json-string-clickable');
-                    valueStr = `"${value.replace('\n', '\\n').substring(0, STRING_LENGTH_CUT - 3)}..."`;
+                    valueStr = getShortString(value);
                     valueElement.onclick = () => {
-                        valueElement.classList.remove('json-string-clickable');
-                        valueElement.classList.add('json-string');
-                        valueElement.onclick = null;
-
-                        beforeInfoLen -= valueStr.length;
-                        valueStr = `"${value}"`;
-                        beforeInfoLen += valueStr.length;
-                        valueElement.textContent = valueStr;
-                        infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
-                        makeKeySelected(path);
+                        const textContent = valueElement.textContent;
+                        if (textContent.length < value.length) {
+                            const additionalMargins = (keyStr.length + delimStr.length + 1/*"*/) / INDENT_SPACES;
+                            valueElement.textContent = getFormattedString(
+                                value, marginBegin + dotLine(BUTTONS_WIDTH + additionalMargins * INDENT_SPACES)
+                            );
+                        } else if (textContent.includes('\n')) {
+                            valueElement.textContent = `"${value}"`;
+                            //TODOz copyToClipboard(value);
+                        } else {
+                            valueElement.textContent = getShortString(value);
+                        }
+                        markKeySelected(path);
                     };
                 } else {
                     valueElement.classList.add('json-string');
@@ -530,7 +570,7 @@
                                 findInput.value = `${value}`;
                                 findButton.onclick(null);
                             }
-                            makeKeySelected(path);
+                            markKeySelected(path);
                         };
                     }
                 } catch (e) {
@@ -545,6 +585,7 @@
             // ---
             keyElement.classList.add('json-key-value');
             keyElement.textContent = keyStr + delimStr;
+
             valueElement.textContent = valueStr;
 
             container.appendChild(marginElement);
@@ -887,12 +928,14 @@
     function gotoParent(
         path = selectedPath,
         action = (parentPath) => {
-            makeKeySelected(parentPath);
+            markKeySelected(parentPath);
         },
     ) {
         if (path != null) {
             const parentPath = getParentPath(path);
-            action(parentPath);
+            if (parentPath !== path) {
+                action(parentPath);
+            }
         }
     }
 
@@ -907,7 +950,7 @@
                         const firstChildId = firstChild.id;
                         if (firstChildId != null) {
                             const firstChildPath = elementIdToPath(firstChildId);
-                            makeKeySelected(firstChildPath);
+                            markKeySelected(firstChildPath);
                         }
                     }
                 }
@@ -934,7 +977,7 @@
             if (isGoInside && inc < 0 && !isCollapsed(groupElement) && groupElement.childElementCount > 0) {
                 gotoFirstChild(nextPath, -1);
             } else {
-                makeKeySelected(nextPath);
+                markKeySelected(nextPath);
             }
         },
         failAction = (path) => {
@@ -1012,17 +1055,17 @@
     }
 
     let selectedPath = null;
-    let selectedKeyOrigColor = null;
 
-    function makeKeySelected(path) {
+    function markKeySelected(path) {
         if (path != null && path !== '') {
-            const newSelectedKey = findKeyElement(path);
-            if (selectedPath != null && selectedKeyOrigColor != null) {
-                const lastSelectedKey = findKeyElement(selectedPath);
-                lastSelectedKey.style.backgroundColor = selectedKeyOrigColor;
+            const newSelectedElement = findRootElement(path);
+            if (selectedPath != null) {
+                const lastSelectedElement = findRootElement(selectedPath);
+                if (lastSelectedElement != null) {
+                    lastSelectedElement.classList.remove('json-key-selected');
+                }
             }
-            selectedKeyOrigColor = newSelectedKey.style.backgroundColor;
-            newSelectedKey.style.backgroundColor = 'blue';
+            newSelectedElement.classList.add('json-key-selected');
 
             selectedPath = path;
         }
