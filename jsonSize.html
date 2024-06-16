@@ -11,18 +11,20 @@
             background-color: #999;
             overflow: hidden;
         }
+
         body {
             margin: 0;
             padding: 0;
         }
-        .json-input {
-        }
-        .json-display {
-            white-space: pre;
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             font-family: monospace;
-            background: #282c34;
-            padding: 1vw;
-            color: #f8f8f2;
         }
 
         .main-container {
@@ -32,101 +34,53 @@
             flex-direction: column;
         }
 
-        .bottom-panel {
-            width: 96.4vw;
-            flex-grow: 1;
-            overflow: auto;
-            margin: 0 0.5vw 0.5vw;
-            border: 0.3vw solid #444;
-            border-radius: 18px;
+        .top-panel {
+            width: 100vw;
+            font-size: 0.7rem;
+            background-color: #cccccccc;
+            outline: #e2e2e2 groove medium;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #61afef;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin: 0.5rem 0 0.5rem 0.5rem;
+        }
+
+        button:hover {
+            background-color: #4a90e2;
+        }
+
+        .find-input {
+            width: 15vw;
+            padding: 10px 6px;
+            margin: 0 0 0 0.5rem;
+        }
+
+        .filename {
+            width: 20vw;
+            height: 100%;
+            cursor: pointer;
+            color: #1654a3;
+            font-weight: bold;
+            padding: 0.9rem;
+            margin: 0 0 0 0.5rem;
+            background: #cccccc;
             outline: #e2e2e2 groove medium;
         }
-        .json-key-group {
-            cursor: pointer;
-            color: #ffe2e3;
-            font-weight: bold;
-            background: #262f40;
-        }
-        .json-key-group:hover {
+
+        .filename:hover {
             color: #338cff;
         }
-        .json-border {
-            cursor: pointer;
-            color: #ff989f;
-            font-weight: bold;
-        }
-        .json-border-clickable {
-            cursor: pointer;
-            color: #ff989f;
-            font-weight: bold;
-        }
-        .json-border-clickable:hover {
-            color: #338cff;
-        }
-        .json-key-value {
-            color: #7da762;
-        }
-        .json-number {
-            color: #96ceff;
-        }
-        .json-string {
-            color: #7fb1d5;
-        }
-        .json-string-clickable {
-            cursor: pointer;
-            color: #d57f7f;
-        }
-        .json-string-clickable:hover {
-            color: #338cff;
-        }
-        .json-margin {
-            color: #999999;
-        }
-        .json-info-group {
-            color: #777777;
-        }
-        .json-info-group-huge {
-            color: #ff0000;
-            font-weight: bold;
-        }
-        .json-info-group-big {
-            color: #ff0000;
-        }
-        .json-info-group-middle {
-            color: #ffde00;
-        }
-        .json-info-group-small {
-            color: #31ad00;
-        }
-        .json-info-group-tiny {
-            color: #4f7640;
-        }
-        .json-duplication {
-            cursor: pointer;
-            color: #ffde00;
-            font-weight: bold;
-            background: #262f40;
-            margin-left: 16px;
-        }
-        .json-duplication:hover {
-            color: #338cff;
-        }
-        .gone {
-            display: none;
-        }
-        .no-select {
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Стандартное свойство */
-        }
-        .invisible {
-            color: transparent;
-            -webkit-user-select: none; /* Safari */
-            -moz-user-select: none; /* Firefox */
-            -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Стандартное свойство */
-        }
+
         .hints {
             width: 13rem;
             height: 100%;
@@ -140,45 +94,58 @@
             outline: #e2e2e2 groove medium;
         }
 
-        .top-panel {
-            width: 100vw;
+        .path {
+            color: #1654a3;
+            font-weight: bold;
             font-size: 0.7rem;
-            background-color: #cccccccc;
+            padding: 0.2rem 20px;
+            margin: 0;
+        }
+
+        .bottom-panel {
+            width: 96.4vw;
+            flex-grow: 1;
+            overflow: auto;
+            margin: 0 0.5vw 0.5vw;
+            border: 0.3vw solid #444;
+            border-radius: 18px;
             outline: #e2e2e2 groove medium;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
         }
-        textarea {
-            width: 100%;
-            height: 150px;
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+
+        .json-input {
+        }
+
+        .json-display {
+            white-space: pre;
             font-family: monospace;
+            background: #282c34;
+            padding: 1vw;
+            color: #f8f8f2;
         }
-        button {
-            padding: 10px 15px;
-            background-color: #61afef;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            margin: 0.5rem 0 0.5rem 0.5rem;
+
+        .gone {
+            display: none;
         }
-        button:hover {
-            background-color: #4a90e2;
+
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Стандартное свойство */
         }
-        .find-input {
-            width: 15vw;
-            padding: 10px 6px;
-            margin: 0 0 0 0.5rem;
+
+        .invisible {
+            color: transparent;
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Стандартное свойство */
         }
+
         .found {
             outline: #00ffed dashed thin;
         }
+
         .found_current {
             font-weight: bold;
             color: white;
@@ -187,26 +154,94 @@
             padding-bottom: 2px;
             outline-style: solid;
         }
-        .filename {
-            width: 20vw;
-            height: 100%;
-            cursor: pointer;
-            color: #1654a3;
-            font-weight: bold;
-            padding: 0.9rem;
-            margin: 0 0 0 0.5rem;
-            background: #cccccc;
-            outline: #e2e2e2 groove medium;
+
+        .json-margin {
+            color: #999999;
         }
-        .filename:hover {
+
+        .json-key-group {
+            cursor: pointer;
+            color: #ffe2e3;
+            font-weight: bold;
+            background: #262f40;
+        }
+
+        .json-key-group:hover {
             color: #338cff;
         }
-        .path {
-            color: #1654a3;
+
+        .json-key-value {
+            color: #7da762;
+        }
+
+        .json-border {
+            cursor: pointer;
+            color: #ff989f;
             font-weight: bold;
-            font-size: 0.7rem;
-            padding: 0.2rem 20px;
-            margin: 0;
+        }
+
+        .json-border-clickable {
+            cursor: pointer;
+            color: #ff989f;
+            font-weight: bold;
+        }
+
+        .json-border-clickable:hover {
+            color: #338cff;
+        }
+
+        .json-number {
+            color: #96ceff;
+        }
+
+        .json-string {
+            color: #7fb1d5;
+        }
+
+        .json-string-clickable {
+            cursor: pointer;
+            color: #d57f7f;
+        }
+
+        .json-string-clickable:hover {
+            color: #338cff;
+        }
+
+        .json-info-group {
+            color: #777777;
+        }
+
+        .json-info-group-huge {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .json-info-group-big {
+            color: #ff0000;
+        }
+
+        .json-info-group-middle {
+            color: #ffde00;
+        }
+
+        .json-info-group-small {
+            color: #31ad00;
+        }
+
+        .json-info-group-tiny {
+            color: #4f7640;
+        }
+
+        .json-duplication {
+            cursor: pointer;
+            color: #ffde00;
+            font-weight: bold;
+            background: #262f40;
+            margin-left: 16px;
+        }
+
+        .json-duplication:hover {
+            color: #338cff;
         }
     </style>
 </head>
@@ -263,519 +298,515 @@
 }</textarea>
 </div>
 
-    <script>
-        const INDENT_SPACES = 4;
-        const BUTTONS_WIDTH = 0;
-        const STRING_LENGTH_LIMIT = 160;
-        const STRING_LENGTH_CUT = 80;
+<script>
+    const INDENT_SPACES = 4;
+    const LINE_SYMBOL = '·' + ' '.repeat(INDENT_SPACES - 1); // '·' U+00B7 &#183; \00B7  |  '—' U+2014 &#8212; \2014
+    const BUTTONS_WIDTH = 0;
+    const STRING_LENGTH_LIMIT = 160;
+    const STRING_LENGTH_CUT = 80;
 
-        function createTreeElement(path, key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
-            const isGroup = typeof value === 'object' && value !== null;
-            const isArray = Array.isArray(value);
+    function pair(a, b) {
+        return {first: a, second: b};
+    }
 
-            const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
-            const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
+    function countOf(string, substring) {
+        let count = -1;
+        let index = -1;
+        do {
+            index = string.indexOf(substring, index + 1);
+            count++;
+        } while (index >= 0);
 
-            const container = document.createElement('div');
-            const keyElement = document.createElement('span');
-            keyElement.id = `KEY(${path})`;
-            const marginElement = document.createElement('span');
-            marginElement.classList.add('json-margin');
-            const infoMarginElement = document.createElement('span');
-            infoMarginElement.classList.add('json-margin');
-            const infoElement = document.createElement('span');
+        return count;
+    }
 
-            const keyStr = key ? `${key}` : '';
-            const delimStr = key ? `: ` : '';
-            const keySize = (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0;
-            const mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
-            sizeOut.value = mySize;
+    function isOnScreen(item) {
+        const topMargin = 70;
+        const rect = item.getBoundingClientRect();
+        return rect.top >= topMargin && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth;
+    }
 
-            let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
-            marginElement.textContent = marginBegin
+    function formatBytes(bytes) {
+        if (bytes < 1024) {
+            return bytes + " bytes";
+        } else if (bytes < 1048576) {
+            return (bytes / 1024).toFixed(2) + " KB";
+        } else if (bytes < 1073741824) {
+            return (bytes / 1048576).toFixed(2) + " MB";
+        } else {
+            return (bytes / 1073741824).toFixed(2) + " GB";
+        }
+    }
 
-            keyElement.onmousemove = () => {
-                const pathElement = document.getElementById('path');
-                pathElement.innerText = path;
+    function formatPercent(bytes, fullSize) {
+        return (bytes * 100.0 / fullSize).toFixed(2) + '%';
+    }
+
+    function createTreeElement(path, key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
+        const isGroup = typeof value === 'object' && value !== null;
+        const isArray = Array.isArray(value);
+
+        const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
+        const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
+
+        const container = document.createElement('div');
+        const keyElement = document.createElement('span');
+        keyElement.id = `KEY(${path})`;
+        const marginElement = document.createElement('span');
+        marginElement.classList.add('json-margin');
+        const infoMarginElement = document.createElement('span');
+        infoMarginElement.classList.add('json-margin');
+        const infoElement = document.createElement('span');
+
+        const keyStr = key ? `${key}` : '';
+        const delimStr = key ? `: ` : '';
+        const keySize = (key && !isParentArray) ? 1/*"*/ + key.length + 1/*"*/ + 1/*:*/ : 0;
+        const mySize = keySize + calculateJsonSize(value) + (isLast ? 0 : 1)/*,*/;
+        sizeOut.value = mySize;
+
+        let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
+        marginElement.textContent = marginBegin
+
+        keyElement.onmousemove = () => {
+            const pathElement = document.getElementById('path');
+            pathElement.innerText = path;
+        }
+
+        if (isGroup) {
+            keyElement.classList.add('json-key-group');
+            keyElement.textContent = keyStr;
+            const borderElement = document.createElement('span');
+            borderElement.classList.add('json-border');
+            const valueElement = document.createElement('div');
+            valueElement.id = `GROUP(${path})`;
+            const closureInlineElement = document.createElement('span');
+            closureInlineElement.classList.add('json-border');
+            const closureMarginElement = document.createElement('span');
+            closureMarginElement.classList.add('json-margin');
+            const closureElement = document.createElement('span');
+            closureElement.classList.add('json-border-clickable');
+
+            function appendValueChildren() {
+                const count = Object.keys(value).length;
+                let i = 0;
+                const valueChildren = [];
+                const childrenSize = {
+                    value: 0
+                };
+                for (const k in value) {
+                    childrenSize.value = 0;
+                    const isLastChild = i === count - 1;
+                    const newPath = `${path}/${k}`;
+                    const child = createTreeElement(newPath, k, value[k], childrenSize, fullSize, level + 1, isLastChild, isArray)
+                    valueChildren.push(pair(childrenSize.value, child));
+                    i++;
+                }
+                valueChildren
+                    .sort((a, b) => b.first - a.first)
+                    .forEach((it) => {
+                        valueElement.appendChild(it.second);
+                    });
             }
 
-            if (isGroup) {
-                keyElement.classList.add('json-key-group');
-                keyElement.textContent = keyStr;
-                const borderElement = document.createElement('span');
-                borderElement.classList.add('json-border');
-                const valueElement = document.createElement('div');
-                valueElement.id = `GROUP(${path})`;
-                const closureInlineElement = document.createElement('span');
-                closureInlineElement.classList.add('json-border');
-                const closureMarginElement = document.createElement('span');
-                closureMarginElement.classList.add('json-margin');
-                const closureElement = document.createElement('span');
-                closureElement.classList.add('json-border-clickable');
-
-                function appendValueChilds() {
-                    const count = Object.keys(value).length;
-                    let i = 0;
-                    const valueChilds = [];
-                    const childSize = {
-                        value: 0
-                    };
-                    for (const k in value) {
-                        childSize.value = 0;
-                        const isLastChild = i === count - 1;
-                        const newPath = `${path}/${k}`;
-                        const child = createTreeElement(newPath, k, value[k], childSize, fullSize, level + 1, isLastChild, isArray)
-                        valueChilds.push(pair(childSize.value, child));
-                        i++;
-                    }
-                    valueChilds
-                        .sort((a, b) => b.first - a.first)
-                        .forEach((it) => {
-                            valueElement.appendChild(it.second);
-                        });
-                }
-
-                function onExpandCollapse(toExpand) {
-                    if (toExpand) {
-                        valueElement.classList.remove('gone');
-                        closureMarginElement.classList.remove('gone');
-                        closureElement.classList.remove('gone');
-                        closureInlineElement.classList.add('invisible');
-                    } else {
-                        valueElement.classList.add('gone');
-                        closureMarginElement.classList.add('gone');
-                        closureElement.classList.add('gone');
-                        closureInlineElement.classList.remove('invisible');
-                    }
-                }
-                // ---
-
-                if (level === 0) {
-                    appendValueChilds();
-                }
-                onExpandCollapse(level === 0);
-
-                keyElement.onclick = () => {
-                    const toExpand = valueElement.classList.contains('gone');
-                    if (toExpand && !valueElement.hasChildNodes()) {
-                        appendValueChilds();
-                    }
-                    onExpandCollapse(toExpand);
-                };
-                borderElement.onclick = keyElement.onclick;
-                closureInlineElement.onclick = keyElement.onclick;
-                closureElement.onclick = keyElement.onclick;
-
-                keyElement.oncontextmenu = () => {
-                    focusThis(path, key, value);
-                    return false;
-                };
-
-                const childCount = Object.keys(value).length;
-                const borderStartStr = isArray ? '[' : '{';
-                beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
-
-                borderElement.textContent = delimStr + borderStartStr;
-                closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + ',';
-                closureMarginElement.textContent = dotLine(indentSpaces);
-                closureElement.textContent = (isArray ? ']' : '}') + ',';
-
-                // ---
-                container.appendChild(marginElement);
-                container.appendChild(keyElement);
-                container.appendChild(borderElement);
-                container.appendChild(closureInlineElement);
-                container.appendChild(infoMarginElement);
-                container.appendChild(infoElement);
-                container.appendChild(valueElement);
-                container.appendChild(closureMarginElement);
-                container.appendChild(closureElement);
-            } else {
-                const valueElement = document.createElement('span');
-                valueElement.id = `VALUE(${path}/VALUE)`;
-                const duplicationElement = document.createElement('span');
-                duplicationElement.classList.add('json-duplication', 'no-select');
-
-                let valueStr;
-                let duplicationStr = '';
-                if (typeof value === 'string') {
-                    if (value.length > STRING_LENGTH_LIMIT) {
-                        valueElement.classList.add('json-string-clickable');
-                        valueStr = `"${value.replace('\n', '\\n').substring(0, STRING_LENGTH_CUT - 3)}..."`;
-                        valueElement.onclick = () => {
-                            valueElement.classList.remove('json-string-clickable');
-                            valueElement.classList.add('json-string');
-                            valueElement.onclick = null;
-
-                            beforeInfoLen -= valueStr.length;
-                            valueStr = `"${value}"`;
-                            beforeInfoLen += valueStr.length;
-                            valueElement.textContent = valueStr;
-                            infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
-                        };
-                    } else {
-                        valueElement.classList.add('json-string');
-                        valueStr = `"${value}"`;
-                    }
-                    valueStr += (isLast ? '' : ',');
-
-                    try {
-                        const count = countOf(jsonString, `${value}`)
-                        if (count > 1) {
-                            duplicationStr += 'Duplication: ' + count + ' times.';
-                            duplicationElement.onclick = () => {
-                                const findInput = document.getElementById('find-input');
-                                const findButton = document.getElementById('find-button');
-                                if (findInput != null && findButton != null) {
-                                    findInput.value = `${value}`;
-                                    findButton.onclick(null);
-                                }
-                            };
-                        }
-                    } catch (e) {
-                        duplicationStr += 'Exception: ' + e.toString();
-                    }
+            function onExpandCollapse(toExpand) {
+                if (toExpand) {
+                    valueElement.classList.remove('gone');
+                    closureMarginElement.classList.remove('gone');
+                    closureElement.classList.remove('gone');
+                    closureInlineElement.classList.add('invisible');
                 } else {
-                    valueElement.classList.add('json-number');
-                    valueStr = value + ',';
+                    valueElement.classList.add('gone');
+                    closureMarginElement.classList.add('gone');
+                    closureElement.classList.add('gone');
+                    closureInlineElement.classList.remove('invisible');
                 }
-                beforeInfoLen += valueStr.length;
+            }
 
-                // ---
-                keyElement.classList.add('json-key-value');
-                keyElement.textContent = keyStr + delimStr;
-                valueElement.textContent = valueStr;
+            // ---
 
-                container.appendChild(marginElement);
-                container.appendChild(keyElement);
-                container.appendChild(valueElement);
-                container.appendChild(infoMarginElement);
-                container.appendChild(infoElement);
+            if (level === 0) {
+                appendValueChildren();
+            }
+            onExpandCollapse(level === 0);
 
-                if (duplicationStr.length > 0) {
-                    duplicationElement.textContent = duplicationStr;
-                    container.appendChild(duplicationElement);
+            keyElement.onclick = () => {
+                const toExpand = valueElement.classList.contains('gone');
+                if (toExpand && !valueElement.hasChildNodes()) {
+                    appendValueChildren();
                 }
-
-                valueElement.onmousemove = keyElement.onmousemove;
-            }
-
-            const infoBytes = formatBytes(mySize);
-            infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
-            infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize);
-            setInfoClass(infoElement, mySize, fullSize);
-
-            return container;
-        }
-
-        function countOf(string, substring) {
-            let count = -1;
-            let index = -1;
-            do {
-                index = string.indexOf(substring, index + 1);
-                count++;
-            } while (index >= 0);
-
-            return count;
-        }
-
-        // console.log(`${countOf('qwertyqwerty', 'qwerty') === 2}`);
-        // console.log(`${countOf('qwertyqwertyqwerty', 'qwerty') === 3}`);
-        // console.log(`${countOf('qwertyqwertyqwerty', 'q')===3}`);
-        // console.log(`${countOf('qwerty json huge info qwerty json info', 'json') === 2}`);
-        // console.log(`${countOf('infoinfoinfo', 'info')===3}`);
-        // console.log(`${countOf('ononono', 'ono')===3}`);
-        // console.log(`${countOf('ononono', 'onon')===2}`);
-        // console.log(`${countOf('nonono', 'onon')===1}`);
-
-        function setInfoClass(infoElement, mySize, fullSize) {
-            if (mySize > fullSize / 2) {
-                infoElement.classList.add('json-info-group-huge');
-            } else if (mySize > fullSize / 5) {
-                infoElement.classList.add('json-info-group-big');
-            } else if (mySize > fullSize / 7) {
-                infoElement.classList.add('json-info-group-middle');
-            } else if (mySize > fullSize / 10) {
-                infoElement.classList.add('json-info-group-small');
-            } else {
-                infoElement.classList.add('json-info-group-tiny');
-            }
-        }
-
-        function getInfoMarginSz(beforeInfo, infoMod = 20) {
-            const beforeInfoMod = Math.floor(beforeInfo / infoMod + 1) * infoMod;
-            return beforeInfoMod - beforeInfo;
-        }
-
-        function pair(a, b){
-            return { first: a, second: b };
-        }
-
-        function calculateJsonSize(jsonData) {
-            const jsonStr = JSON.stringify(jsonData);
-            return jsonStr.length;
-        }
-
-        function formatBytes(bytes) {
-            if (bytes < 1024) {
-                return bytes + " bytes";
-            } else if (bytes < 1048576) {
-                return (bytes / 1024).toFixed(2) + " KB";
-            } else if (bytes < 1073741824) {
-                return (bytes / 1048576).toFixed(2) + " MB";
-            } else {
-                return (bytes / 1073741824).toFixed(2) + " GB";
-            }
-        }
-
-        function formatPercent(bytes, fullSize) {
-            return (bytes * 100.0 / fullSize).toFixed(2) + '%';
-        }
-
-        const LINE_SYMBOL = '·' + ' '.repeat(INDENT_SPACES - 1); // '·' U+00B7 &#183; \00B7  |  '—' U+2014 &#8212; \2014
-        let longDotLine = '';
-        const oneLen = LINE_SYMBOL.length;
-        function dotLine(charCount, fromStart = 0) {
-            if (charCount === 0) return '';
-            const fullLen = fromStart + charCount;
-            if (longDotLine.length < fullLen) {
-                longDotLine = LINE_SYMBOL.repeat(fullLen / oneLen + oneLen);
-            }
-            return longDotLine.substring(fromStart, fullLen - 1) + ' ';
-        }
-
-        function marginAlignmentRight(str, fromStart) {
-            const extPadding = getInfoMarginSz(fromStart);
-            const fullWidth = 16;
-            const padding = Math.max(fullWidth - str.length, 0);
-            return dotLine(padding + extPadding, fromStart);
-        }
-
-        function focusThis(path, key, node) {
-            const display = document.getElementById('json-display');
-            jsonString = `{"${key}":${JSON.stringify(node)}}`;
-            try {
-                json = JSON.parse(jsonString);
-            } catch (e) {
-                alert('Invalid JSON');
-                return;
-            }
-            display.innerHTML = '';
-            lastSearchRequest = '';
-            let size = {
-                value: 0
+                onExpandCollapse(toExpand);
             };
-            display.appendChild(createTreeElement('', '', json, size, jsonString.length));
-        }
+            borderElement.onclick = keyElement.onclick;
+            closureInlineElement.onclick = keyElement.onclick;
+            closureElement.onclick = keyElement.onclick;
 
-        function formatJSON() {
-            const input = document.getElementById('json-input');
+            keyElement.oncontextmenu = () => {
+                focusThis(path, key, value);
+                return false;
+            };
 
-            let json;
-            try {
-                json = JSON.parse(input.value);
-            } catch (e) {
-                alert('Invalid JSON');
-                return;
-            }
+            const childCount = Object.keys(value).length;
+            const borderStartStr = isArray ? '[' : '{';
+            beforeInfoLen += BUTTONS_WIDTH + borderStartStr.length + `${childCount}`.length + (isLast ? 1/*}*/ : 2/*},*/);
 
-            input.value = JSON.stringify(json, null, ' ');
-        }
+            borderElement.textContent = delimStr + borderStartStr;
+            closureInlineElement.textContent = childCount + (isArray ? ']' : '}') + ',';
+            closureMarginElement.textContent = dotLine(indentSpaces);
+            closureElement.textContent = (isArray ? ']' : '}') + ',';
 
-        function findInJson(json, str, path = '') {
-            let result = '';
-            const isArray = Array.isArray(json);
+            // ---
+            container.appendChild(marginElement);
+            container.appendChild(keyElement);
+            container.appendChild(borderElement);
+            container.appendChild(closureInlineElement);
+            container.appendChild(infoMarginElement);
+            container.appendChild(infoElement);
+            container.appendChild(valueElement);
+            container.appendChild(closureMarginElement);
+            container.appendChild(closureElement);
+        } else {
+            const valueElement = document.createElement('span');
+            valueElement.id = `VALUE(${path}/VALUE)`;
+            const duplicationElement = document.createElement('span');
+            duplicationElement.classList.add('json-duplication', 'no-select');
 
-            for (const key in json) {
-                const newPath = `${path}/${key}`;
-                const value = json[key];
-                if (!isArray && key.toUpperCase().includes(str)) {
-                    result += `${newPath};\n`;
-                }
-                const isGroup = typeof value === 'object' && value !== null;
-                if (isGroup) {
-                    result += findInJson(value, str, newPath);
+            let valueStr;
+            let duplicationStr = '';
+            if (typeof value === 'string') {
+                if (value.length > STRING_LENGTH_LIMIT) {
+                    valueElement.classList.add('json-string-clickable');
+                    valueStr = `"${value.replace('\n', '\\n').substring(0, STRING_LENGTH_CUT - 3)}..."`;
+                    valueElement.onclick = () => {
+                        valueElement.classList.remove('json-string-clickable');
+                        valueElement.classList.add('json-string');
+                        valueElement.onclick = null;
+
+                        beforeInfoLen -= valueStr.length;
+                        valueStr = `"${value}"`;
+                        beforeInfoLen += valueStr.length;
+                        valueElement.textContent = valueStr;
+                        infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
+                    };
                 } else {
-                    if (`${value}`.toUpperCase().includes(str)) {
-                        result += `${newPath}/VALUE;\n`;
+                    valueElement.classList.add('json-string');
+                    valueStr = `"${value}"`;
+                }
+                valueStr += (isLast ? '' : ',');
+
+                try {
+                    const count = countOf(jsonString, `${value}`)
+                    if (count > 1) {
+                        duplicationStr += 'Duplication: ' + count + ' times.';
+                        duplicationElement.onclick = () => {
+                            const findInput = document.getElementById('find-input');
+                            const findButton = document.getElementById('find-button');
+                            if (findInput != null && findButton != null) {
+                                findInput.value = `${value}`;
+                                findButton.onclick(null);
+                            }
+                        };
                     }
-                }
-            }
-
-            return result;
-        }
-
-        let lastSearchRequest = '';
-        let lastSearchIndex = -1;
-        function search() {
-            const findInput = document.getElementById('find-input');
-            const findButton = document.getElementById('find-button');
-            const request = findInput.value;
-            if (request.length === 0) return;
-            const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
-
-            if (lastSearchRequest !== request) {
-                lastSearchIndex = -1;
-
-                const lastFound = document.getElementsByClassName('found');
-                for (let i = 0; i < lastFound.length; i++) {
-                    try {
-                        lastFound[i].classList.remove('found_current', 'found');
-                        lastFound[i].classList.remove('found_current', 'found');
-                        lastFound[i].classList.remove('found_current', 'found');
-                        lastFound[i].classList.remove('found_current', 'found');
-                    } catch (e) {}
-                }
-            }
-            lastSearchRequest = request;
-
-            lastSearchIndex++;
-            if (results.length <= lastSearchIndex) {
-                lastSearchIndex = 0;
-            }
-            if (results.length <= 1) {
-                findButton.innerText = 'Search';
-            } else {
-                findButton.innerText = `Search (${lastSearchIndex + 1}/${results.length})`;
-            }
-
-            if (results.length > lastSearchIndex) {
-                for (let i = 0; i < results.length; i++) {
-                    markAsFound(results[i], i === lastSearchIndex);
-                }
-            }
-        }
-
-        function markAsFound(path, isCurrent) {
-            const pathItems = path.split('/');
-            let subPath = '';
-            for (const i in pathItems) {
-                if (i === 0 || i === '0') continue;
-
-                subPath += `/${pathItems[i]}`;
-                const keyItem = document.getElementById(`KEY(${subPath})`);
-                const groupItem = document.getElementById(`GROUP(${subPath})`);
-                if (keyItem != null) {
-                    if (isCurrent && groupItem != null) {
-                        const isCollapsed = groupItem.classList.contains('gone');
-                        if (isCollapsed) {
-                            keyItem.onclick(null);
-                        }
-                    }
-                }
-            }
-
-            if (isCurrent) {
-                const lastFoundCurrent = document.getElementsByClassName('found_current');
-                for (let i = 0; i < lastFoundCurrent.length; i++) {
-                    lastFoundCurrent[i].classList.remove('found_current');
-                }
-            }
-
-            const valueItem = document.getElementById(`VALUE(${path})`);
-            if (valueItem !== null) {
-                if (isCurrent) {
-                    valueItem.classList.add('found', 'found_current');
-                    if (!isOnScreen(valueItem)) {
-                        valueItem.scrollIntoView({block: 'center'});
-                    }
-                } else {
-                    valueItem.classList.add('found');
+                } catch (e) {
+                    duplicationStr += 'Exception: ' + e.toString();
                 }
             } else {
-                const keyItem = document.getElementById(`KEY(${path})`);
-                if (keyItem !== null) {
-                    if (isCurrent) {
-                        keyItem.classList.add('found', 'found_current');
-                        if (!isOnScreen(keyItem)) {
-                            keyItem.scrollIntoView({block: 'center'});
-                        }
-                    } else {
-                        keyItem.classList.add('found');
-                    }
-                }
+                valueElement.classList.add('json-number');
+                valueStr = value + ',';
             }
-        }
+            beforeInfoLen += valueStr.length;
 
-        function isOnScreen(item) {
-            const topMargin = 70;
-            const rect = item.getBoundingClientRect();
-            return rect.top >= topMargin && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth;
-        }
+            // ---
+            keyElement.classList.add('json-key-value');
+            keyElement.textContent = keyStr + delimStr;
+            valueElement.textContent = valueStr;
 
-        function switchToTextView() {
-            const displayJSONButton = document.getElementById('displayJSON-button');
-            displayJSONButton.innerText = "Display JSON";
-            document.getElementById('formatJSON-button').classList.remove('gone');
-            document.getElementById('toText-button').classList.add('gone');
-            document.getElementById('search-box').classList.add('gone');
-            document.getElementById('hints').classList.add('gone');
-            document.getElementById('json-display').classList.add('gone');
-            const input = document.getElementById('json-input');
-            input.classList.remove('gone');
-        }
+            container.appendChild(marginElement);
+            container.appendChild(keyElement);
+            container.appendChild(valueElement);
+            container.appendChild(infoMarginElement);
+            container.appendChild(infoElement);
 
-        function switchToJsonView() {
-            const input = document.getElementById('json-input');
-            const display = document.getElementById('json-display');
-            display.classList.remove('gone');
-            input.classList.add('gone');
-            const displayJSONButton = document.getElementById('displayJSON-button');
-            displayJSONButton.innerText = "Reset";
-            document.getElementById('search-box').classList.remove('gone');
-            document.getElementById('hints').classList.remove('gone');
-            document.getElementById('formatJSON-button').classList.add('gone');
-            document.getElementById('toText-button').classList.remove('gone');
-        }
-
-        function toText() {
-            switchToTextView();
-            const input = document.getElementById('json-input');
-            input.value = jsonString;
-            formatJSON();
-        }
-
-        function loadFile() {
-            const fileInput = document.getElementById("filename");
-            const fileContent = document.getElementById("json-input");
-            if (fileInput.files && fileInput.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    fileContent.value = e.target.result;
-                };
-                reader.readAsText(fileInput.files[0]);
-                switchToTextView();
-            } else {
-                alert("Пожалуйста, выберите файл.");
+            if (duplicationStr.length > 0) {
+                duplicationElement.textContent = duplicationStr;
+                container.appendChild(duplicationElement);
             }
+
+            valueElement.onmousemove = keyElement.onmousemove;
         }
+
+        const infoBytes = formatBytes(mySize);
+        infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
+        infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize);
+        setInfoClass(infoElement, mySize, fullSize);
+
+        return container;
+    }
+
+    function setInfoClass(infoElement, mySize, fullSize) {
+        if (mySize > fullSize / 2) {
+            infoElement.classList.add('json-info-group-huge');
+        } else if (mySize > fullSize / 5) {
+            infoElement.classList.add('json-info-group-big');
+        } else if (mySize > fullSize / 7) {
+            infoElement.classList.add('json-info-group-middle');
+        } else if (mySize > fullSize / 10) {
+            infoElement.classList.add('json-info-group-small');
+        } else {
+            infoElement.classList.add('json-info-group-tiny');
+        }
+    }
+
+    function getInfoMarginSz(beforeInfo, infoMod = 20) {
+        const beforeInfoMod = Math.floor(beforeInfo / infoMod + 1) * infoMod;
+        return beforeInfoMod - beforeInfo;
+    }
+
+    function calculateJsonSize(jsonData) {
+        const jsonStr = JSON.stringify(jsonData);
+        return jsonStr.length;
+    }
+
+    let longDotLine = '';
+    const oneLen = LINE_SYMBOL.length;
+
+    function dotLine(charCount, fromStart = 0) {
+        if (charCount === 0) return '';
+        const fullLen = fromStart + charCount;
+        if (longDotLine.length < fullLen) {
+            longDotLine = LINE_SYMBOL.repeat(fullLen / oneLen + oneLen);
+        }
+        return longDotLine.substring(fromStart, fullLen - 1) + ' ';
+    }
+
+    function marginAlignmentRight(str, fromStart) {
+        const extPadding = getInfoMarginSz(fromStart);
+        const fullWidth = 16;
+        const padding = Math.max(fullWidth - str.length, 0);
+        return dotLine(padding + extPadding, fromStart);
+    }
+
+    function focusThis(path, key, node) {
+        const display = document.getElementById('json-display');
+        jsonString = `{"${key}":${JSON.stringify(node)}}`;
+        try {
+            json = JSON.parse(jsonString);
+        } catch (e) {
+            alert('Invalid JSON');
+            return;
+        }
+        display.innerHTML = '';
+        lastSearchRequest = '';
+        let size = {
+            value: 0
+        };
+        display.appendChild(createTreeElement('', '', json, size, jsonString.length));
+    }
+
+    function formatJSON() {
+        const input = document.getElementById('json-input');
 
         let json;
-        let jsonString = '';
-        function displayJSON() {
-            const input = document.getElementById('json-input');
-
-            try {
-                json = JSON.parse(input.value);
-            } catch (e) {
-                alert('Invalid JSON');
-                return;
-            }
-            jsonString = JSON.stringify(json);
-
-            const display = document.getElementById('json-display');
-            display.innerHTML = '';
-            lastSearchRequest = '';
-            let sizeOut = {
-                value: 0
-            };
-            display.appendChild(createTreeElement('', '', json, sizeOut, jsonString.length));
-            display.normalize();
-
-            switchToJsonView();
+        try {
+            json = JSON.parse(input.value);
+        } catch (e) {
+            alert('Invalid JSON');
+            return;
         }
 
-        switchToTextView()
-    </script>
+        input.value = JSON.stringify(json, null, ' ');
+    }
+
+    function findInJson(json, str, path = '') {
+        let result = '';
+        const isArray = Array.isArray(json);
+
+        for (const key in json) {
+            const newPath = `${path}/${key}`;
+            const value = json[key];
+            if (!isArray && key.toUpperCase().includes(str)) {
+                result += `${newPath};\n`;
+            }
+            const isGroup = typeof value === 'object' && value !== null;
+            if (isGroup) {
+                result += findInJson(value, str, newPath);
+            } else {
+                if (`${value}`.toUpperCase().includes(str)) {
+                    result += `${newPath}/VALUE;\n`;
+                }
+            }
+        }
+
+        return result;
+    }
+
+    let lastSearchRequest = '';
+    let lastSearchIndex = -1;
+
+    function search() {
+        const findInput = document.getElementById('find-input');
+        const findButton = document.getElementById('find-button');
+        const request = findInput.value;
+        if (request.length === 0) return;
+        const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
+
+        if (lastSearchRequest !== request) {
+            lastSearchIndex = -1;
+
+            const lastFound = document.getElementsByClassName('found');
+            for (let i = 0; i < lastFound.length; i++) {
+                try {
+                    lastFound[i].classList.remove('found_current', 'found');
+                    lastFound[i].classList.remove('found_current', 'found');
+                    lastFound[i].classList.remove('found_current', 'found');
+                    lastFound[i].classList.remove('found_current', 'found');
+                } catch (e) {
+                }
+            }
+        }
+        lastSearchRequest = request;
+
+        lastSearchIndex++;
+        if (results.length <= lastSearchIndex) {
+            lastSearchIndex = 0;
+        }
+        if (results.length <= 1) {
+            findButton.innerText = 'Search';
+        } else {
+            findButton.innerText = `Search (${lastSearchIndex + 1}/${results.length})`;
+        }
+
+        if (results.length > lastSearchIndex) {
+            for (let i = 0; i < results.length; i++) {
+                markAsFound(results[i], i === lastSearchIndex);
+            }
+        }
+    }
+
+    function markAsFound(path, isCurrent) {
+        const pathItems = path.split('/');
+        let subPath = '';
+        for (const i in pathItems) {
+            if (i === 0 || i === '0') continue;
+
+            subPath += `/${pathItems[i]}`;
+            const keyItem = document.getElementById(`KEY(${subPath})`);
+            const groupItem = document.getElementById(`GROUP(${subPath})`);
+            if (keyItem != null) {
+                if (isCurrent && groupItem != null) {
+                    const isCollapsed = groupItem.classList.contains('gone');
+                    if (isCollapsed) {
+                        keyItem.onclick(null);
+                    }
+                }
+            }
+        }
+
+        if (isCurrent) {
+            const lastFoundCurrent = document.getElementsByClassName('found_current');
+            for (let i = 0; i < lastFoundCurrent.length; i++) {
+                lastFoundCurrent[i].classList.remove('found_current');
+            }
+        }
+
+        const valueItem = document.getElementById(`VALUE(${path})`);
+        if (valueItem !== null) {
+            if (isCurrent) {
+                valueItem.classList.add('found', 'found_current');
+                if (!isOnScreen(valueItem)) {
+                    valueItem.scrollIntoView({block: 'center'});
+                }
+            } else {
+                valueItem.classList.add('found');
+            }
+        } else {
+            const keyItem = document.getElementById(`KEY(${path})`);
+            if (keyItem !== null) {
+                if (isCurrent) {
+                    keyItem.classList.add('found', 'found_current');
+                    if (!isOnScreen(keyItem)) {
+                        keyItem.scrollIntoView({block: 'center'});
+                    }
+                } else {
+                    keyItem.classList.add('found');
+                }
+            }
+        }
+    }
+
+    function switchToTextView() {
+        const displayJSONButton = document.getElementById('displayJSON-button');
+        displayJSONButton.innerText = "Display JSON";
+        document.getElementById('formatJSON-button').classList.remove('gone');
+        document.getElementById('toText-button').classList.add('gone');
+        document.getElementById('search-box').classList.add('gone');
+        document.getElementById('hints').classList.add('gone');
+        document.getElementById('json-display').classList.add('gone');
+        const input = document.getElementById('json-input');
+        input.classList.remove('gone');
+    }
+
+    function switchToJsonView() {
+        const input = document.getElementById('json-input');
+        const display = document.getElementById('json-display');
+        display.classList.remove('gone');
+        input.classList.add('gone');
+        const displayJSONButton = document.getElementById('displayJSON-button');
+        displayJSONButton.innerText = "Reset";
+        document.getElementById('search-box').classList.remove('gone');
+        document.getElementById('hints').classList.remove('gone');
+        document.getElementById('formatJSON-button').classList.add('gone');
+        document.getElementById('toText-button').classList.remove('gone');
+    }
+
+    function toText() {
+        switchToTextView();
+        const input = document.getElementById('json-input');
+        input.value = jsonString;
+        formatJSON();
+    }
+
+    function loadFile() {
+        const fileInput = document.getElementById("filename");
+        const fileContent = document.getElementById("json-input");
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                fileContent.value = e.target.result;
+            };
+            reader.readAsText(fileInput.files[0]);
+            switchToTextView();
+        } else {
+            alert("Пожалуйста, выберите файл.");
+        }
+    }
+
+    let json;
+    let jsonString = '';
+
+    function displayJSON() {
+        const input = document.getElementById('json-input');
+
+        try {
+            json = JSON.parse(input.value);
+        } catch (e) {
+            alert('Invalid JSON');
+            return;
+        }
+        jsonString = JSON.stringify(json);
+
+        const display = document.getElementById('json-display');
+        display.innerHTML = '';
+        lastSearchRequest = '';
+        let sizeOut = {
+            value: 0
+        };
+        display.appendChild(createTreeElement('', '', json, sizeOut, jsonString.length));
+        display.normalize();
+
+        switchToJsonView();
+    }
+
+    switchToTextView()
+</script>
 </body>
 </html>
