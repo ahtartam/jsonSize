@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!--suppress CssUnusedSymbol, HtmlFormInputWithoutLabel -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -121,6 +122,10 @@
             background: #282c34;
             padding: 1vw;
             color: #f8f8f2;
+        }
+
+        .json-display:focus {
+            border-color: #1111c6;
         }
 
         .gone {
@@ -270,7 +275,7 @@
 
     <p id="path" class="path">&nbsp;</p>
 
-    <div id="json-display" class="json-display bottom-panel"></div>
+    <div id="json-display" class="json-display bottom-panel" tabindex="0"></div>
 
     <textarea id="json-input" class="json-input bottom-panel" placeholder="Paste your JSON here...">{
     "name": "John",
@@ -342,6 +347,59 @@
         return (bytes * 100.0 / fullSize).toFixed(2) + '%';
     }
 
+    function getParentPath(path) {
+        const split = path.split('/');
+        return split.slice(0, split.length - 1).join('/');
+    }
+
+    function elementIdToPath(keyId) {
+        if (keyId != null && keyId.length > 0) {
+            const split = keyId.split('(');
+            if (split != null && split.length > 1) {
+                const split2 = split[1].split(')');
+                if (split2 != null && split2.length > 0) {
+                    return split2[0];
+                }
+            }
+        }
+        return null;
+    }
+
+    function getLevelByPath(path) {
+        if (path != null) {
+            return path.split('/').length;
+        }
+        return 0;
+    }
+
+    function getRootId(path) {
+        return `ROOT(${path})`;
+    }
+
+    function getKeyId(path) {
+        return `KEY(${path})`;
+    }
+
+    function getGroupKey(path) {
+        return `GROUP(${path})`;
+    }
+
+    function getValueKey(path) {
+        return `VALUE(${path}/VALUE)`;
+    }
+
+    function findKeyElement(path) {
+        return document.getElementById(getKeyId(path));
+    }
+
+    function findGroupElement(path) {
+        return document.getElementById(getGroupKey(path));
+    }
+
+    function findValueElement(path) {
+        return document.getElementById(getValueKey(path));
+    }
+
     function createTreeElement(path, key, value, sizeOut, fullSize, level = 0, isLast = true, isParentArray = false) {
         const isGroup = typeof value === 'object' && value !== null;
         const isArray = Array.isArray(value);
@@ -350,8 +408,10 @@
         const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
 
         const container = document.createElement('div');
+        container.classList.add('json-container');
+        container.id = getRootId(path);
         const keyElement = document.createElement('span');
-        keyElement.id = `KEY(${path})`;
+        keyElement.id = getKeyId(path);
         const marginElement = document.createElement('span');
         marginElement.classList.add('json-margin');
         const infoMarginElement = document.createElement('span');
@@ -378,7 +438,7 @@
             const borderElement = document.createElement('span');
             borderElement.classList.add('json-border');
             const valueElement = document.createElement('div');
-            valueElement.id = `GROUP(${path})`;
+            valueElement.id = getGroupKey(path);
             const closureInlineElement = document.createElement('span');
             closureInlineElement.classList.add('json-border');
             const closureMarginElement = document.createElement('span');
@@ -386,55 +446,19 @@
             const closureElement = document.createElement('span');
             closureElement.classList.add('json-border-clickable');
 
-            function appendValueChildren() {
-                const count = Object.keys(value).length;
-                let i = 0;
-                const valueChildren = [];
-                const childrenSize = {
-                    value: 0
-                };
-                for (const k in value) {
-                    childrenSize.value = 0;
-                    const isLastChild = i === count - 1;
-                    const newPath = `${path}/${k}`;
-                    const child = createTreeElement(newPath, k, value[k], childrenSize, fullSize, level + 1, isLastChild, isArray)
-                    valueChildren.push(pair(childrenSize.value, child));
-                    i++;
-                }
-                valueChildren
-                    .sort((a, b) => b.first - a.first)
-                    .forEach((it) => {
-                        valueElement.appendChild(it.second);
-                    });
-            }
-
-            function onExpandCollapse(toExpand) {
-                if (toExpand) {
-                    valueElement.classList.remove('gone');
-                    closureMarginElement.classList.remove('gone');
-                    closureElement.classList.remove('gone');
-                    closureInlineElement.classList.add('invisible');
-                } else {
-                    valueElement.classList.add('gone');
-                    closureMarginElement.classList.add('gone');
-                    closureElement.classList.add('gone');
-                    closureInlineElement.classList.remove('invisible');
-                }
-            }
-
             // ---
 
             if (level === 0) {
-                appendValueChildren();
+                appendValueChildren(path, value, valueElement, fullSize, level, isArray);
             }
-            onExpandCollapse(level === 0);
+            const closureElements = [valueElement, closureMarginElement, closureElement];
+            const closureElementsNegative = [closureInlineElement];
+            onExpandCollapse(level === 0, closureElements, closureElementsNegative);
 
             keyElement.onclick = () => {
-                const toExpand = valueElement.classList.contains('gone');
-                if (toExpand && !valueElement.hasChildNodes()) {
-                    appendValueChildren();
-                }
-                onExpandCollapse(toExpand);
+                const toExpand = isCollapsed(valueElement);
+                makeExpandCollapse(toExpand, path, value, fullSize, level, isArray, valueElement, closureElements, closureElementsNegative);
+                makeKeySelected(path);
             };
             borderElement.onclick = keyElement.onclick;
             closureInlineElement.onclick = keyElement.onclick;
@@ -442,6 +466,7 @@
 
             keyElement.oncontextmenu = () => {
                 focusThis(path, key, value);
+                makeKeySelected(path);
                 return false;
             };
 
@@ -466,7 +491,7 @@
             container.appendChild(closureElement);
         } else {
             const valueElement = document.createElement('span');
-            valueElement.id = `VALUE(${path}/VALUE)`;
+            valueElement.id = getValueKey(path);
             const duplicationElement = document.createElement('span');
             duplicationElement.classList.add('json-duplication', 'no-select');
 
@@ -486,6 +511,7 @@
                         beforeInfoLen += valueStr.length;
                         valueElement.textContent = valueStr;
                         infoMarginElement.textContent = marginAlignmentRight(infoBytes, beforeInfoLen);
+                        makeKeySelected(path);
                     };
                 } else {
                     valueElement.classList.add('json-string');
@@ -504,6 +530,7 @@
                                 findInput.value = `${value}`;
                                 findButton.onclick(null);
                             }
+                            makeKeySelected(path);
                         };
                     }
                 } catch (e) {
@@ -540,6 +567,84 @@
         setInfoClass(infoElement, mySize, fullSize);
 
         return container;
+    }
+
+    function isCollapsed(groupItem) {
+        if (groupItem != null) {
+            return groupItem.classList.contains('gone');
+        } else return true;
+    }
+
+    function appendValueChildren(path, value, valueElement, fullSize, level, isArray) {
+        const count = Object.keys(value).length;
+        let i = 0;
+        const valueChildren = [];
+        const childrenSize = {
+            value: 0
+        };
+        for (const k in value) {
+            childrenSize.value = 0;
+            const isLastChild = i === count - 1;
+            const newPath = `${path}/${k}`;
+            const child = createTreeElement(newPath, k, value[k], childrenSize, fullSize, level + 1, isLastChild, isArray)
+            valueChildren.push(pair(childrenSize.value, child));
+            i++;
+        }
+        valueChildren
+            .sort((a, b) => b.first - a.first)
+            .forEach((it) => {
+                valueElement.appendChild(it.second);
+            });
+    }
+
+    function onExpandCollapse(toExpand, closureElements, closureElementsNegative) {
+        if (toExpand) {
+            closureElements.forEach((it) => {
+                it.classList.remove('gone');
+            });
+            closureElementsNegative.forEach((it) => {
+                it.classList.add('invisible');
+            });
+        } else {
+            closureElements.forEach((it) => {
+                it.classList.add('gone');
+            });
+            closureElementsNegative.forEach((it) => {
+                it.classList.remove('invisible');
+            });
+        }
+    }
+
+    function makeExpandCollapse(toExpand, path, value, fullSize, level, isArray, valueElement, closureElements, closureElementsNegative) {
+        if (toExpand && !valueElement.hasChildNodes()) {
+            appendValueChildren(path, value, valueElement, fullSize, level, isArray);
+        }
+        onExpandCollapse(toExpand, closureElements, closureElementsNegative);
+    }
+
+    function makeExpandCollapseByPath(
+        toExpand,
+        path,
+        nextAction = () => {
+        }
+    ) {
+        if (path != null) {
+            const keyElement = findKeyElement(path);
+            if (keyElement != null) {
+                const groupElement = findGroupElement(path);
+                if (groupElement != null) {
+                    if (isCollapsed(groupElement) === toExpand) {
+                        keyElement.onclick(null);
+                    } else {
+                        nextAction();
+                    }
+                } else {
+                    if (!toExpand) {
+                        nextAction();
+                    }
+                }
+            }
+        }
     }
 
     function setInfoClass(infoElement, mySize, fullSize) {
@@ -689,12 +794,11 @@
             if (i === 0 || i === '0') continue;
 
             subPath += `/${pathItems[i]}`;
-            const keyItem = document.getElementById(`KEY(${subPath})`);
-            const groupItem = document.getElementById(`GROUP(${subPath})`);
+            const keyItem = findKeyElement(subPath);
+            const groupItem = findGroupElement(subPath);
             if (keyItem != null) {
                 if (isCurrent && groupItem != null) {
-                    const isCollapsed = groupItem.classList.contains('gone');
-                    if (isCollapsed) {
+                    if (isCollapsed(groupItem)) {
                         keyItem.onclick(null);
                     }
                 }
@@ -719,7 +823,7 @@
                 valueItem.classList.add('found');
             }
         } else {
-            const keyItem = document.getElementById(`KEY(${path})`);
+            const keyItem = findKeyElement(path);
             if (keyItem !== null) {
                 if (isCurrent) {
                     keyItem.classList.add('found', 'found_current');
@@ -780,6 +884,150 @@
         }
     }
 
+    function gotoParent(
+        path = selectedPath,
+        action = (parentPath) => {
+            makeKeySelected(parentPath);
+        },
+    ) {
+        if (path != null) {
+            const parentPath = getParentPath(path);
+            action(parentPath);
+        }
+    }
+
+    function gotoFirstChild(path = selectedPath, index = 0) {
+        if (path != null) {
+            const groupElement = findGroupElement(path);
+            if (groupElement != null) {
+                const children = groupElement.children;
+                if (children != null && children.length > 0) {
+                    const firstChild = children[(index >= 0) ? index : (children.length - 1)];
+                    if (firstChild != null) {
+                        const firstChildId = firstChild.id;
+                        if (firstChildId != null) {
+                            const firstChildPath = elementIdToPath(firstChildId);
+                            makeKeySelected(firstChildPath);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function gotoNextInParent(inc, path = selectedPath) {
+        if (inc < 0) {
+            gotoParent(path);
+        } else {
+            gotoParent(path, (parentPath) => {
+                gotoDownOrUp(1, false, parentPath);
+            });
+        }
+    }
+
+    function gotoDownOrUp(
+        inc,
+        isGoInside,
+        path = selectedPath,
+        action = (nextPath) => {
+            const groupElement = findGroupElement(nextPath);
+            if (isGoInside && inc < 0 && !isCollapsed(groupElement) && groupElement.childElementCount > 0) {
+                gotoFirstChild(nextPath, -1);
+            } else {
+                makeKeySelected(nextPath);
+            }
+        },
+        failAction = (path) => {
+            gotoNextInParent(inc, path);
+        }
+    ) {
+        if (path != null) {
+            const groupElement = findGroupElement(path);
+            if (isGoInside && inc > 0 && !isCollapsed(groupElement) && groupElement.childElementCount > 0) {
+                gotoFirstChild(path);
+            } else {
+                const keyElement = findKeyElement(path);
+                const myLevel = getLevelByPath(path);
+                if (keyElement != null) {
+                    const myGroupElement = keyElement.parentElement;
+                    if (myGroupElement != null) {
+                        const myGroupId = myGroupElement.id;
+                        const parentGroupElement = myGroupElement.parentElement;
+                        if (parentGroupElement != null) {
+                            const keyElements = Array.from(parentGroupElement.getElementsByClassName('json-container'))
+                                .filter(item => {
+                                    const itemId = item.id;
+                                    const itemPath = elementIdToPath(itemId);
+                                    const level = getLevelByPath(itemPath);
+                                    return level === myLevel;
+                                });
+                            if (keyElements != null && keyElements.length > 1) {
+                                const myIndex = keyElements.findIndex(element => element.id === myGroupId);
+                                if (myIndex >= 0) {
+                                    const nextIndex = myIndex + inc;
+                                    if (nextIndex >= 0 && nextIndex < keyElements.length) {
+                                        const nextKeyElement = keyElements[nextIndex];
+                                        if (nextKeyElement != null) {
+                                            const nextPath = elementIdToPath(nextKeyElement.id);
+                                            action(nextPath)
+                                        }
+                                    } else {
+                                        failAction(path);
+                                    }
+                                }
+                            } else {
+                                failAction(path);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    function jsonDisplayKeyPressed(keyEvent) {
+        const keysMap = {
+            ArrowLeft: (isCtrlPressed) => {
+                makeExpandCollapseByPath(false, selectedPath, () => {
+                    gotoParent();
+                });
+            },
+            ArrowUp: (isCtrlPressed) => {
+                gotoDownOrUp(-1, !isCtrlPressed);
+            },
+            ArrowRight: (isCtrlPressed) => {
+                makeExpandCollapseByPath(true, selectedPath, () => {
+                    gotoFirstChild();
+                });
+            },
+            ArrowDown: (isCtrlPressed) => {
+                gotoDownOrUp(1, !isCtrlPressed);
+            }
+        };
+        const action = keysMap[keyEvent.code];
+        if (action != null) {
+            const isCtrlPressed = keyEvent.shiftKey || keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
+            action(isCtrlPressed);
+        }
+    }
+
+    let selectedPath = null;
+    let selectedKeyOrigColor = null;
+
+    function makeKeySelected(path) {
+        if (path != null && path !== '') {
+            const newSelectedKey = findKeyElement(path);
+            if (selectedPath != null && selectedKeyOrigColor != null) {
+                const lastSelectedKey = findKeyElement(selectedPath);
+                lastSelectedKey.style.backgroundColor = selectedKeyOrigColor;
+            }
+            selectedKeyOrigColor = newSelectedKey.style.backgroundColor;
+            newSelectedKey.style.backgroundColor = 'blue';
+
+            selectedPath = path;
+        }
+    }
+
     let json;
     let jsonString = '';
 
@@ -807,6 +1055,13 @@
     }
 
     switchToTextView()
+
+    document.onkeydown = (event) => {
+        const display = document.getElementById('json-display');
+        if (display === document.activeElement) {
+            jsonDisplayKeyPressed(event);
+        }
+    }
 </script>
 </body>
 </html>
