@@ -5,35 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSON Size</title>
     <style>
-        body {
+        html {
             font-family: Arial, sans-serif;
+            font-size: 1.2em;
+            background-color: #999;
+            overflow: hidden;
+        }
+        body {
             margin: 0;
             padding: 0;
-            background-color: #999;
-            /*width: 300vw;*/
         }
         .json-input {
-            max-width: 98%;
-            height: 700px;
-            overflow-y: auto;
-            border: 6px solid #444;
-            border-radius: 18px;
-            margin: 6px auto;
-            outline: #e2e2e2 groove medium;
         }
-        .json-container {
-            overflow-y: auto;
-            white-space: pre-wrap;
+        .json-display {
+            white-space: pre;
             font-family: monospace;
-            /*font-size: 1.3em;*/
-            /*font-size: large;*/
             background: #282c34;
-            border: 6px solid #444;
-            padding: 20px;
-            border-radius: 18px;
+            padding: 1vw;
             color: #f8f8f2;
-            max-width: 97%;
-            margin: 0 auto 6px;
+        }
+
+        .main-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .bottom-panel {
+            width: 96.4vw;
+            flex-grow: 1;
+            overflow: auto;
+            margin: 0 0.5vw 0.5vw;
+            border: 0.3vw solid #444;
+            border-radius: 18px;
             outline: #e2e2e2 groove medium;
         }
         .json-key-group {
@@ -46,6 +51,7 @@
             color: #338cff;
         }
         .json-border {
+            cursor: pointer;
             color: #ff989f;
             font-weight: bold;
         }
@@ -122,22 +128,26 @@
             user-select: none; /* Стандартное свойство */
         }
         .hints {
-            line-height: 6px;
-            padding: 0 16px;
+            width: 13rem;
+            height: 100%;
+            line-height: 0.01rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 1rem;
             margin: 0;
             background: #cccccc;
             outline: #e2e2e2 groove medium;
         }
-        .container {
+
+        .top-panel {
+            width: 100vw;
+            font-size: 0.7rem;
             background-color: #cccccccc;
-            border: 2px solid #7b7b7b;
-            position: -webkit-sticky;
-            position: sticky;
-            top: 0;
+            outline: #e2e2e2 groove medium;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 15px;
         }
         textarea {
             width: 100%;
@@ -155,17 +165,16 @@
             border: none;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 0.8rem;
+            margin: 0.5rem 0 0.5rem 0.5rem;
         }
         button:hover {
             background-color: #4a90e2;
         }
         .find-input {
+            width: 15vw;
             padding: 10px 6px;
-            margin-left: 35px;
-        }
-        .find-button {
-            margin-left: 15px;
+            margin: 0 0 0 0.5rem;
         }
         .found {
             outline: #00ffed dashed thin;
@@ -179,11 +188,13 @@
             outline-style: solid;
         }
         .filename {
-            width: 400px;
+            width: 20vw;
+            height: 100%;
             cursor: pointer;
             color: #1654a3;
             font-weight: bold;
-            padding: 10px 16px;
+            padding: 0.9rem;
+            margin: 0 0 0 0.5rem;
             background: #cccccc;
             outline: #e2e2e2 groove medium;
         }
@@ -193,23 +204,23 @@
         .path {
             color: #1654a3;
             font-weight: bold;
-            padding-left: 20px;
-            padding-top: 0;
-            padding-bottom: 0;
+            font-size: 0.7rem;
+            padding: 0.2rem 20px;
             margin: 0;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+<div class="main-container">
+    <div class="top-panel">
         <div>
             <button id="displayJSON-button" onclick="displayJSON()">Display JSON</button>
             <button id="formatJSON-button" onclick="formatJSON()">Format</button>
             <button id="toText-button" onclick="toText()">to Text</button>
         </div>
         <div id="search-box">
-            <input id="find-input" class="find-input" size="40" value="">
-            <button id="find-button" class="find-button" onclick="search()">Search</button>
+            <input id="find-input" class="find-input">
+            <button id="find-button" onclick="search()">Search</button>
         </div>
         <div>
             <input id="filename" class="filename" type="file" onchange="loadFile()"/>
@@ -224,9 +235,9 @@
 
     <p id="path" class="path">&nbsp;</p>
 
-    <div id="json-display" class="json-container"></div>
+    <div id="json-display" class="json-display bottom-panel"></div>
 
-    <textarea id="json-input" class="json-input" placeholder="Paste your JSON here...">{
+    <textarea id="json-input" class="json-input bottom-panel" placeholder="Paste your JSON here...">{
     "name": "John",
     "age": 30,
     "married": true,
@@ -250,6 +261,7 @@
         }
     }
 }</textarea>
+</div>
 
     <script>
         const INDENT_SPACES = 4;
@@ -762,10 +774,8 @@
 
             switchToJsonView();
         }
-        document.getElementById('toText-button').classList.add('gone');
-        document.getElementById('json-display').classList.add('gone');
-        document.getElementById('search-box').classList.add('gone');
-        document.getElementById('hints').classList.add('gone');
+
+        switchToTextView()
     </script>
 </body>
 </html>
