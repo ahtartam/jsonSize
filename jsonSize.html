@@ -19,13 +19,7 @@
         }
 
         textarea {
-            width: 100%;
-            height: 150px;
-            margin-bottom: 10px;
             padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-family: monospace;
         }
 
         .main-container {
@@ -109,12 +103,18 @@
             outline: #e2e2e2 groove medium;
         }
 
-        .path {
+        .path-info {
+            cursor: pointer;
             color: #1654a3;
             font-weight: bold;
             font-size: 0.7rem;
             padding: 0.2rem 20px;
             margin: 0;
+            white-space: nowrap;
+        }
+
+        .path-info:hover {
+            color: #0071ff;
         }
 
         .bottom-panel {
@@ -241,16 +241,16 @@
         }
 
         .found {
+            font-weight: bold;
+            color: white;
+            background-color: #000;
             outline: #00ffed dashed thin;
         }
 
         .found_current {
-            font-weight: bold;
-            color: white;
-            background-color: #000;
             padding-top: 2px;
             padding-bottom: 2px;
-            outline-style: solid;
+            outline: #00ffed solid thin;
         }
 
         .json-placeholder-button {
@@ -307,6 +307,22 @@
         .toast-visible {
             opacity: 1;
         }
+
+        .div-horizontal {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
+
+        .div-vertical {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+            margin: 0;
+        }
     </style>
 </head>
 <body>
@@ -320,7 +336,7 @@
         <div id="search-box" class="search-box">
             <input id="find-input" class="find-input" placeholder="Search by key or value. (not both at once)">
             <button id="find-back-button" class="find-button" onclick="search(-1)">&#9664;</button>
-            <p id="find-info" class="find-info">&nbsp;&nbsp;-&nbsp;&nbsp;</p>
+            <p id="find-info" class="find-info no-select" onclick="search()">&nbsp;&nbsp;-&nbsp;&nbsp;</p>
             <button id="find-button" class="find-button" onclick="search()">&#9654;</button>
         </div>
         <div>
@@ -335,7 +351,7 @@
         </div>
     </div>
 
-    <p id="path" class="path">&nbsp;</p>
+    <p id="path-info" class="path-info">&nbsp;</p>
 
     <div id="json-display" class="json-display bottom-panel" tabindex="0"></div>
 
@@ -481,7 +497,7 @@
     }
 
     function getValueKey(path) {
-        return `VALUE(${path}/VALUE)`;
+        return `VALUE(${path})`;
     }
 
     function findRootElement(path) {
@@ -507,7 +523,6 @@
         const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
         const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
 
-        const pathElement = document.getElementById('path');
         const container = document.createElement('div');
         container.classList.add('json-container');
         container.id = getRootId(path);
@@ -529,15 +544,6 @@
 
         let beforeInfoLen = marginBegin.length + keyStr.length + delimStr.length;
         marginElement.textContent = marginBegin
-
-        keyElement.onmousemove = () => {
-            if (path.length > 0) {
-                pathElement.innerText = path;
-            }
-        }
-        marginElement.onmousemove = keyElement.onmousemove;
-        infoMarginElement.onmousemove = keyElement.onmousemove;
-        infoElement.onmousemove = keyElement.onmousemove;
 
         if (isGroup) {
             keyElement.classList.add('json-key-group');
@@ -578,13 +584,8 @@
             infoMarginElement.onclick = marginElement.onclick;
             infoElement.onclick = marginElement.onclick;
 
-            borderElement.onmousemove = keyElement.onmousemove;
-            closureInlineElement.onmousemove = keyElement.onmousemove;
-            closureElement.onmousemove = keyElement.onmousemove;
-
             keyElement.oncontextmenu = () => {
                 focusThis(path, key, value);
-                markKeySelected(path);
                 return false;
             };
 
@@ -623,8 +624,6 @@
             infoMarginElement.onclick = keyElement.onclick;
             infoElement.onclick = keyElement.onclick;
 
-            valueElement.onmousemove = keyElement.onmousemove;
-
             let valueStr;
             let duplicationStr = '';
             if (typeof value === 'string') {
@@ -658,7 +657,7 @@
                             duplicationStr += 'Duplication: ' + count + ' times.';
                             duplicationElement.onclick = () => {
                                 const findInput = document.getElementById('find-input');
-                                if (findInput != null && findButton != null) {
+                                if (findInput != null) {
                                     findInput.value = `${value}`;
                                     search();
                                 }
@@ -873,7 +872,7 @@
                 result += findInJson(value, str, newPath);
             } else {
                 if (`${value}`.toUpperCase().includes(str)) {
-                    result += `${newPath}/VALUE;\n`;
+                    result += `${newPath};\n`;
                 }
             }
         }
@@ -885,17 +884,7 @@
     let lastSearchIndex = -1;
 
     function search(direction = 1) {
-        const findInput = document.getElementById('find-input');
-        const findBackButton = document.getElementById('find-back-button');
-        const findInfo = document.getElementById('find-info');
-        const findButton = document.getElementById('find-button');
-        const request = findInput.value;
-        if (request.length === 0) return;
-        const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
-
-        if (lastSearchRequest !== request) {
-            lastSearchIndex = -1;
-
+        function resetSearchMarks() {
             const lastFound = document.getElementsByClassName('found');
             for (let i = 0; i < lastFound.length; i++) {
                 try {
@@ -907,6 +896,32 @@
                 }
             }
         }
+
+        function resetSearch() {
+            resetSearchMarks();
+            lastSearchRequest = '';
+            lastSearchIndex = -1;
+            findInfo.innerText = `\xa0\xa0-\xa0\xa0`;
+        }
+
+        const findInput = document.getElementById('find-input');
+        const findInfo = document.getElementById('find-info');
+        const request = findInput.value;
+        if (request.length === 0) {
+            resetSearch();
+            return;
+        }
+        const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
+
+        if (results.length <= 0) {
+            resetSearch();
+            return;
+        }
+
+        if (lastSearchRequest !== request) {
+            lastSearchIndex = -1;
+            resetSearchMarks();
+        }
         lastSearchRequest = request;
 
         lastSearchIndex += direction;
@@ -916,22 +931,11 @@
         if (lastSearchIndex >= results.length) {
             lastSearchIndex = 0;
         }
-        if (results.length <= 1) {
-            findButton.innerText = 'Search';
-            findBackButton.classList.add('gone');
-            findInfo.classList.add('gone');
-        } else {
-            findInfo.innerText = `(${lastSearchIndex + 1}/${results.length})`;
-            findButton.innerText = `\u25B6`;
-            findBackButton.innerText = `\u25C0`;
-            findBackButton.classList.remove('gone');
-            findInfo.classList.remove('gone');
-        }
 
-        if (results.length > lastSearchIndex) {
-            for (let i = 0; i < results.length; i++) {
-                markAsFound(results[i], i === lastSearchIndex);
-            }
+        findInfo.innerText = `(${lastSearchIndex + 1}/${results.length})`;
+
+        for (let i = 0; i < results.length; i++) {
+            markAsFound(results[i], i === lastSearchIndex);
         }
     }
 
@@ -958,9 +962,10 @@
             for (let i = 0; i < lastFoundCurrent.length; i++) {
                 lastFoundCurrent[i].classList.remove('found_current');
             }
+            markKeySelected(path);
         }
 
-        const valueItem = document.getElementById(`VALUE(${path})`);
+        const valueItem = findValueElement(path);
         if (valueItem !== null) {
             if (isCurrent) {
                 valueItem.classList.add('found', 'found_current');
@@ -995,6 +1000,7 @@
         document.getElementById('json-display').classList.add('gone');
         const input = document.getElementById('json-input');
         input.classList.remove('gone');
+        updatePathInfo('');
     }
 
     function switchToJsonView() {
@@ -1008,6 +1014,7 @@
         document.getElementById('hints').classList.remove('gone');
         document.getElementById('formatJSON-button').classList.add('gone');
         document.getElementById('toText-button').classList.remove('gone');
+        updatePathInfo('');
     }
 
     function toText() {
@@ -1158,11 +1165,6 @@
         if (action != null) {
             const isCtrlPressed = keyEvent.shiftKey || keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
             action(isCtrlPressed);
-
-            const pathElement = document.getElementById('path');
-            if (pathElement != null && selectedPath != null) {
-                pathElement.innerText = selectedPath;
-            }
         }
     }
 
@@ -1177,9 +1179,24 @@
                     lastSelectedElement.classList.remove('json-key-selected');
                 }
             }
-            newSelectedElement.classList.add('json-key-selected');
+            if (newSelectedElement != null) {
+                newSelectedElement.classList.add('json-key-selected');
+            }
 
             selectedPath = path;
+
+            updatePathInfo(selectedPath);
+        }
+    }
+
+    function updatePathInfo(path) {
+        const pathElement = document.getElementById('path-info');
+        if (pathElement != null && path != null) {
+            if (path.length === 0) {
+                pathElement.innerText = '\xa0';
+            } else {
+                pathElement.innerText = path;
+            }
         }
     }
 
@@ -1222,6 +1239,11 @@
             if (event.key === 'Enter') {
                 search();
             }
+        };
+
+        const pathInfo = document.getElementById('path-info');
+        pathInfo.onclick = () => {
+            copyToClipboard(pathInfo.innerText);
         };
     }
 
