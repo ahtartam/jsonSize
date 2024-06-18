@@ -60,10 +60,28 @@
             background-color: #4a90e2;
         }
 
+        .search-box {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .find-button {
+            height: 30px;
+            width: 30px;
+            padding: 0;
+            margin: 0;
+        }
+
+        .find-info {
+            padding: 0;
+            margin: 0 0.2rem;
+        }
+
         .find-input {
             width: 15vw;
             padding: 10px 6px;
-            margin: 0 0 0 0.5rem;
+            margin: 0 0.5rem;
         }
 
         .filename {
@@ -84,10 +102,8 @@
         .hints {
             width: 13rem;
             height: 100%;
-            line-height: 0.01rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-size: 0.6rem;
+            line-height: 0.1rem;
             padding: 0 1rem;
             margin: 0;
             outline: #e2e2e2 groove medium;
@@ -301,9 +317,11 @@
             <button id="formatJSON-button" onclick="formatJSON()">Format</button>
             <button id="toText-button" onclick="toText()">to Text</button>
         </div>
-        <div id="search-box">
-            <input id="find-input" class="find-input">
-            <button id="find-button" onclick="search()">Search</button>
+        <div id="search-box" class="search-box">
+            <input id="find-input" class="find-input" placeholder="Search by key or value. (not both at once)">
+            <button id="find-back-button" class="find-button" onclick="search(-1)">&#9664;</button>
+            <p id="find-info" class="find-info">&nbsp;&nbsp;-&nbsp;&nbsp;</p>
+            <button id="find-button" class="find-button" onclick="search()">&#9654;</button>
         </div>
         <div>
             <input id="filename" class="filename" type="file" onchange="loadFile()"/>
@@ -313,6 +331,7 @@
         <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
             <p><b>Right click</b> - focus on the selected node.</p>
+            <p>You can use <b>arrows</b> to navigate</p>
         </div>
     </div>
 
@@ -488,6 +507,7 @@
         const indentSpaces = BUTTONS_WIDTH + level * INDENT_SPACES;
         const marginBegin = dotLine(indentSpaces + (isGroup ? -BUTTONS_WIDTH : 0));
 
+        const pathElement = document.getElementById('path');
         const container = document.createElement('div');
         container.classList.add('json-container');
         container.id = getRootId(path);
@@ -511,9 +531,13 @@
         marginElement.textContent = marginBegin
 
         keyElement.onmousemove = () => {
-            const pathElement = document.getElementById('path');
-            pathElement.innerText = path;
+            if (path.length > 0) {
+                pathElement.innerText = path;
+            }
         }
+        marginElement.onmousemove = keyElement.onmousemove;
+        infoMarginElement.onmousemove = keyElement.onmousemove;
+        infoElement.onmousemove = keyElement.onmousemove;
 
         if (isGroup) {
             keyElement.classList.add('json-key-group');
@@ -548,9 +572,15 @@
             borderElement.onclick = keyElement.onclick;
             closureInlineElement.onclick = keyElement.onclick;
             closureElement.onclick = keyElement.onclick;
-            marginElement.onclick = keyElement.onclick;
-            infoMarginElement.onclick = keyElement.onclick;
-            infoElement.onclick = keyElement.onclick;
+            marginElement.onclick = () => {
+                markKeySelected(path);
+            };
+            infoMarginElement.onclick = marginElement.onclick;
+            infoElement.onclick = marginElement.onclick;
+
+            borderElement.onmousemove = keyElement.onmousemove;
+            closureInlineElement.onmousemove = keyElement.onmousemove;
+            closureElement.onmousemove = keyElement.onmousemove;
 
             keyElement.oncontextmenu = () => {
                 focusThis(path, key, value);
@@ -621,22 +651,23 @@
                 }
                 valueStr += (isLast ? '' : ',');
 
-                try {
-                    const count = countOf(jsonString, `${value}`)
-                    if (count > 1) {
-                        duplicationStr += 'Duplication: ' + count + ' times.';
-                        duplicationElement.onclick = () => {
-                            const findInput = document.getElementById('find-input');
-                            const findButton = document.getElementById('find-button');
-                            if (findInput != null && findButton != null) {
-                                findInput.value = `${value}`;
-                                findButton.onclick(null);
-                            }
-                            markKeySelected(path);
-                        };
+                if (value.length > 0) {
+                    try {
+                        const count = countOf(jsonString, `${value}`)
+                        if (count > 1) {
+                            duplicationStr += 'Duplication: ' + count + ' times.';
+                            duplicationElement.onclick = () => {
+                                const findInput = document.getElementById('find-input');
+                                if (findInput != null && findButton != null) {
+                                    findInput.value = `${value}`;
+                                    search();
+                                }
+                                markKeySelected(path);
+                            };
+                        }
+                    } catch (e) {
+                        duplicationStr += 'Exception: ' + e.toString();
                     }
-                } catch (e) {
-                    duplicationStr += 'Exception: ' + e.toString();
                 }
             } else {
                 valueElement.classList.add('json-number');
@@ -853,8 +884,10 @@
     let lastSearchRequest = '';
     let lastSearchIndex = -1;
 
-    function search() {
+    function search(direction = 1) {
         const findInput = document.getElementById('find-input');
+        const findBackButton = document.getElementById('find-back-button');
+        const findInfo = document.getElementById('find-info');
         const findButton = document.getElementById('find-button');
         const request = findInput.value;
         if (request.length === 0) return;
@@ -876,14 +909,23 @@
         }
         lastSearchRequest = request;
 
-        lastSearchIndex++;
-        if (results.length <= lastSearchIndex) {
+        lastSearchIndex += direction;
+        if (lastSearchIndex < 0) {
+            lastSearchIndex = results.length - 1;
+        }
+        if (lastSearchIndex >= results.length) {
             lastSearchIndex = 0;
         }
         if (results.length <= 1) {
             findButton.innerText = 'Search';
+            findBackButton.classList.add('gone');
+            findInfo.classList.add('gone');
         } else {
-            findButton.innerText = `Search (${lastSearchIndex + 1}/${results.length})`;
+            findInfo.innerText = `(${lastSearchIndex + 1}/${results.length})`;
+            findButton.innerText = `\u25B6`;
+            findBackButton.innerText = `\u25C0`;
+            findBackButton.classList.remove('gone');
+            findInfo.classList.remove('gone');
         }
 
         if (results.length > lastSearchIndex) {
@@ -1116,6 +1158,11 @@
         if (action != null) {
             const isCtrlPressed = keyEvent.shiftKey || keyEvent.altKey || keyEvent.ctrlKey || keyEvent.metaKey;
             action(isCtrlPressed);
+
+            const pathElement = document.getElementById('path');
+            if (pathElement != null && selectedPath != null) {
+                pathElement.innerText = selectedPath;
+            }
         }
     }
 
@@ -1162,14 +1209,24 @@
         switchToJsonView();
     }
 
-    switchToTextView()
+    function init() {
+        document.onkeydown = (event) => {
+            const display = document.getElementById('json-display');
+            if (display === document.activeElement) {
+                jsonDisplayKeyPressed(event);
+            }
+        };
 
-    document.onkeydown = (event) => {
-        const display = document.getElementById('json-display');
-        if (display === document.activeElement) {
-            jsonDisplayKeyPressed(event);
-        }
+        const findInput = document.getElementById('find-input');
+        findInput.onkeydown = (event) => {
+            if (event.key === 'Enter') {
+                search();
+            }
+        };
     }
+
+    init();
+    switchToTextView();
 </script>
 </body>
 </html>
