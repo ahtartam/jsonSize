@@ -150,6 +150,10 @@
             color: #999999;
         }
 
+        .json-info-margin {
+            color: #999999;
+        }
+
         .json-key-group {
             cursor: pointer;
             color: #ffe2e3;
@@ -347,6 +351,24 @@
             <p id="search-info" class="search-info no-select" onclick="search()">&nbsp;&nbsp;-&nbsp;&nbsp;</p>
             <button id="search-button" class="search-button" onclick="search()">&#9654;</button>
         </div>
+        <div id="settings-box" class="div-horizontal">
+            <div class="div-vertical">
+                <label>
+                    <input id="is-search-case-sensitive" type="checkbox"> Case-sensitive search
+                </label>
+                <label>
+                    <input id="is-copy-formatted-json" type="checkbox" checked> Copy formatted json
+                </label>
+            </div>
+            <div class="div-vertical" style="margin-left: 1em;">
+                <label>
+                    <input id="is-show-info" type="checkbox" checked> Show info
+                </label>
+                <label>
+                    <input id="is-sorting-by-size" type="checkbox" checked> Sort nodes by size
+                </label>
+            </div>
+        </div>
         <div>
             <input id="filename" class="filename" type="file" onchange="loadFile()"/>
         </div>
@@ -540,8 +562,9 @@
         const marginElement = document.createElement('span');
         marginElement.classList.add('json-margin');
         const infoMarginElement = document.createElement('span');
-        infoMarginElement.classList.add('json-margin');
+        infoMarginElement.classList.add('json-info-margin');
         const infoElement = document.createElement('span');
+        infoElement.classList.add('json-info');
 
         const keyStr = key ? `${key}` : '';
         const delimStr = key ? `: ` : '';
@@ -700,7 +723,13 @@
         }
 
         copyButton.onclick = () => {
-            copyToClipboard(keyStr + delimStr + JSON.stringify(value));
+            const nodeJson = '{' + `"${keyStr}"` + delimStr + JSON.stringify(value) + '}';
+            const isCopyFormattedJson = document.getElementById('is-copy-formatted-json').checked;
+            if (isCopyFormattedJson) {
+                copyToClipboard(JSON.stringify(JSON.parse(nodeJson), null, '    '));
+            } else {
+                copyToClipboard(nodeJson);
+            }
             markKeySelected(path);
         }
 
@@ -709,7 +738,29 @@
         infoElement.textContent = infoBytes + ' | ' + formatPercent(mySize, fullSize);
         setInfoClass(infoElement, mySize, fullSize);
 
+        updateInfoVisibility(container);
+
         return container;
+    }
+
+    function updateInfoVisibility(root = document, isShowInfo = document.getElementById('is-show-info').checked) {
+        function updateInfoVisibilityInternal(className, classNameForModify = 'gone') {
+            const items = root.getElementsByClassName(className);
+            for (let i = 0; i < items.length; i++) {
+                if (isShowInfo) {
+                    items[i].classList.remove(classNameForModify);
+                } else {
+                    items[i].classList.add(classNameForModify);
+                }
+            }
+        }
+
+        updateInfoVisibilityInternal('json-copy-button');
+        updateInfoVisibilityInternal('json-margin', 'invisible');
+        updateInfoVisibilityInternal('json-info-margin');
+        updateInfoVisibilityInternal('json-info');
+        updateInfoVisibilityInternal('json-placeholder-button');
+        updateInfoVisibilityInternal('json-duplication');
     }
 
     function isCollapsed(groupItem) {
@@ -733,11 +784,15 @@
             valueChildren.push(pair(childrenSize.value, child));
             i++;
         }
-        valueChildren
-            .sort((a, b) => b.first - a.first)
-            .forEach((it) => {
-                valueElement.appendChild(it.second);
-            });
+
+        const isSortingBySize = document.getElementById('is-sorting-by-size').checked;
+        if (isSortingBySize) {
+            valueChildren.sort((a, b) => b.first - a.first)
+        }
+
+        valueChildren.forEach((it) => {
+            valueElement.appendChild(it.second);
+        });
     }
 
     function onExpandCollapse(toExpand, closureElements, closureElementsNegative) {
@@ -865,20 +920,46 @@
     }
 
     function findInJson(json, request, path = '') {
+        let requestStr;
+        const isCaseSensitiveSearch = document.getElementById('is-search-case-sensitive').checked;
+        if (isCaseSensitiveSearch) {
+            requestStr = request;
+        } else {
+            requestStr = request.toUpperCase();
+        }
+
         let result = '';
         const isArray = Array.isArray(json);
 
         for (const key in json) {
             const newPath = `${path}/${key}`;
             const value = json[key];
-            if (!isArray && key.toUpperCase().includes(request)) {
-                result += `${newPath};\n`;
+
+            if (!isArray) {
+                let keyStr;
+                if (isCaseSensitiveSearch) {
+                    keyStr = key;
+                } else {
+                    keyStr = key.toUpperCase();
+                }
+
+                if (keyStr.includes(requestStr)) {
+                    result += `${newPath};\n`;
+                }
             }
+
             const isGroup = typeof value === 'object' && value !== null;
             if (isGroup) {
-                result += findInJson(value, request, newPath);
+                result += findInJson(value, requestStr, newPath);
             } else {
-                if (`${value}`.toUpperCase().includes(request)) {
+                let valueStr;
+                if (isCaseSensitiveSearch) {
+                    valueStr = `${value}`;
+                } else {
+                    valueStr = `${value}`.toUpperCase();
+                }
+
+                if (valueStr.includes(requestStr)) {
                     result += `${newPath};\n`;
                 }
             }
@@ -918,7 +999,8 @@
             resetSearch();
             return;
         }
-        const results = findInJson(json, request.toUpperCase()).split(';\n').filter((v) => v.length > 0);
+
+        const results = findInJson(json, request).split(';\n').filter((v) => v.length > 0);
 
         if (results.length <= 0) {
             resetSearch();
@@ -1003,6 +1085,7 @@
         document.getElementById('formatJSON-button').classList.remove('gone');
         document.getElementById('toText-button').classList.add('gone');
         document.getElementById('search-box').classList.add('gone');
+        document.getElementById('settings-box').classList.add('gone');
         document.getElementById('hints').classList.add('gone');
         document.getElementById('json-display').classList.add('gone');
         const input = document.getElementById('json-input');
@@ -1018,6 +1101,7 @@
         const displayJSONButton = document.getElementById('displayJSON-button');
         displayJSONButton.innerText = "Reset";
         document.getElementById('search-box').classList.remove('gone');
+        document.getElementById('settings-box').classList.remove('gone');
         document.getElementById('hints').classList.remove('gone');
         document.getElementById('formatJSON-button').classList.add('gone');
         document.getElementById('toText-button').classList.remove('gone');
@@ -1252,6 +1336,21 @@
         pathInfo.onclick = () => {
             copyToClipboard(pathInfo.innerText);
         };
+
+        const isShowInfo = document.getElementById('is-show-info');
+        isShowInfo.onclick = () => {
+            updateInfoVisibility(document, isShowInfo.checked);
+        }
+
+        const isSortingBySize = document.getElementById('is-sorting-by-size');
+        isSortingBySize.onclick = () => {
+            displayJSON();
+        }
+
+        const isCaseSensitiveSearch = document.getElementById('is-search-case-sensitive');
+        isCaseSensitiveSearch.onclick = () => {
+            search();
+        }
     }
 
     init();
