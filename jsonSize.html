@@ -60,22 +60,22 @@
             align-items: center;
         }
 
-        .find-button {
+        .search-input {
+            width: 15vw;
+            padding: 10px 6px;
+            margin: 0 0.5rem;
+        }
+
+        .search-button {
             height: 30px;
             width: 30px;
             padding: 0;
             margin: 0;
         }
 
-        .find-info {
-            padding: 0;
-            margin: 0 0.2rem;
-        }
-
-        .find-input {
-            width: 15vw;
-            padding: 10px 6px;
-            margin: 0 0.5rem;
+        .search-info {
+            margin: 0;
+            padding: 10px 0.2rem;
         }
 
         .filename {
@@ -86,7 +86,6 @@
             font-weight: bold;
             padding: 0.9rem;
             margin: 0 0 0 0.5rem;
-            outline: #e2e2e2 groove medium;
         }
 
         .filename:hover {
@@ -254,6 +253,7 @@
         }
 
         .json-placeholder-button {
+            margin-right: 10px;
         }
 
         .json-placeholder-button::before {
@@ -263,6 +263,7 @@
         .json-copy-button {
             cursor: pointer;
             color: #ffffff;
+            margin-right: 10px;
         }
 
         .json-copy-button::before {
@@ -319,6 +320,13 @@
         .div-vertical {
             display: flex;
             flex-direction: column;
+            padding: 0;
+            margin: 0;
+        }
+
+        .div-vertical-centered {
+            display: flex;
+            flex-direction: column;
             align-items: center;
             padding: 0;
             margin: 0;
@@ -334,16 +342,14 @@
             <button id="toText-button" onclick="toText()">to Text</button>
         </div>
         <div id="search-box" class="search-box">
-            <input id="find-input" class="find-input" placeholder="Search by key or value. (not both at once)">
-            <button id="find-back-button" class="find-button" onclick="search(-1)">&#9664;</button>
-            <p id="find-info" class="find-info no-select" onclick="search()">&nbsp;&nbsp;-&nbsp;&nbsp;</p>
-            <button id="find-button" class="find-button" onclick="search()">&#9654;</button>
+            <input id="search-input" class="search-input" placeholder="Search by key or value. (not both at once)">
+            <button id="search-back-button" class="search-button" onclick="search(-1)">&#9664;</button>
+            <p id="search-info" class="search-info no-select" onclick="search()">&nbsp;&nbsp;-&nbsp;&nbsp;</p>
+            <button id="search-button" class="search-button" onclick="search()">&#9654;</button>
         </div>
         <div>
             <input id="filename" class="filename" type="file" onchange="loadFile()"/>
         </div>
-        <div></div>
-        <div></div>
         <div id="hints" class="hints">
             <p><b>Left click</b> - expand/collapse the node.</p>
             <p><b>Right click</b> - focus on the selected node.</p>
@@ -351,7 +357,7 @@
         </div>
     </div>
 
-    <p id="path-info" class="path-info">&nbsp;</p>
+    <p id="path-info" class="path-info" title="Click to copy the path to the clipboard">&nbsp;</p>
 
     <div id="json-display" class="json-display bottom-panel" tabindex="0"></div>
 
@@ -528,6 +534,7 @@
         container.id = getRootId(path);
         const copyButton = document.createElement('span');
         copyButton.classList.add('json-copy-button');
+        copyButton.setAttribute('title', 'Click to copy this node to the clipboard');
         const keyElement = document.createElement('span');
         keyElement.id = getKeyId(path);
         const marginElement = document.createElement('span');
@@ -656,12 +663,11 @@
                         if (count > 1) {
                             duplicationStr += 'Duplication: ' + count + ' times.';
                             duplicationElement.onclick = () => {
-                                const findInput = document.getElementById('find-input');
-                                if (findInput != null) {
-                                    findInput.value = `${value}`;
+                                const searchInput = document.getElementById('search-input');
+                                if (searchInput != null) {
+                                    searchInput.value = `${value}`;
                                     search();
                                 }
-                                markKeySelected(path);
                             };
                         }
                     } catch (e) {
@@ -695,6 +701,7 @@
 
         copyButton.onclick = () => {
             copyToClipboard(keyStr + delimStr + JSON.stringify(value));
+            markKeySelected(path);
         }
 
         const infoBytes = formatBytes(mySize);
@@ -854,24 +861,24 @@
             return;
         }
 
-        input.value = JSON.stringify(json, null, ' ');
+        input.value = JSON.stringify(json, null, '    ');
     }
 
-    function findInJson(json, str, path = '') {
+    function findInJson(json, request, path = '') {
         let result = '';
         const isArray = Array.isArray(json);
 
         for (const key in json) {
             const newPath = `${path}/${key}`;
             const value = json[key];
-            if (!isArray && key.toUpperCase().includes(str)) {
+            if (!isArray && key.toUpperCase().includes(request)) {
                 result += `${newPath};\n`;
             }
             const isGroup = typeof value === 'object' && value !== null;
             if (isGroup) {
-                result += findInJson(value, str, newPath);
+                result += findInJson(value, request, newPath);
             } else {
-                if (`${value}`.toUpperCase().includes(str)) {
+                if (`${value}`.toUpperCase().includes(request)) {
                     result += `${newPath};\n`;
                 }
             }
@@ -901,12 +908,12 @@
             resetSearchMarks();
             lastSearchRequest = '';
             lastSearchIndex = -1;
-            findInfo.innerText = `\xa0\xa0-\xa0\xa0`;
+            searchInfo.innerText = `\xa0\xa0-\xa0\xa0`;
         }
 
-        const findInput = document.getElementById('find-input');
-        const findInfo = document.getElementById('find-info');
-        const request = findInput.value;
+        const searchInput = document.getElementById('search-input');
+        const searchInfo = document.getElementById('search-info');
+        const request = searchInput.value;
         if (request.length === 0) {
             resetSearch();
             return;
@@ -932,7 +939,7 @@
             lastSearchIndex = 0;
         }
 
-        findInfo.innerText = `(${lastSearchIndex + 1}/${results.length})`;
+        searchInfo.innerText = `(${lastSearchIndex + 1}/${results.length})`;
 
         for (let i = 0; i < results.length; i++) {
             markAsFound(results[i], i === lastSearchIndex);
@@ -1234,8 +1241,8 @@
             }
         };
 
-        const findInput = document.getElementById('find-input');
-        findInput.onkeydown = (event) => {
+        const searchInput = document.getElementById('search-input');
+        searchInput.onkeydown = (event) => {
             if (event.key === 'Enter') {
                 search();
             }
