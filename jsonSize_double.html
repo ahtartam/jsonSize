@@ -1,0 +1,25 @@
+<html lang="en">
+<body>
+<div id="buttons" style="display: flex; justify-content: center; width: 100vh; height: 40px;">
+    <button>Обновить</button>
+    <button>Обновить</button>
+</div>
+<div style="display: flex; justify-content: center; height: 95vh;">
+    <iframe height="100%" id="iframeLeft" scrolling="yes" src="jsonSize.html" width="50%"></iframe>
+    <iframe height="100%" id="iframeRight" scrolling="yes" src="jsonSize.html" width="50%"></iframe>
+</div>
+<script>
+    const iframes = document.querySelectorAll('iframe');
+    const buttons = document.querySelectorAll('button');
+    const iframeLeft = document.getElementById('iframeLeft');
+    const iframeRight = document.getElementById('iframeRight');
+    for (let i = 0; i < iframes.length; i++) {
+        const btn = buttons[i];
+        btn.onclick = () => {
+            // noinspection SillyAssignmentJS
+            iframes[i].src = iframes[i].src;
+        }
+    }
+</script>
+</body>
+</html>
